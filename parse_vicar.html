@@ -1,0 +1,73 @@
+<!DOCTYPE html><html lang="en">
+<head></head>
+  <h2 id="url"></h2>
+  <h2>VICAR System Labels</h2>
+  <pre id="sys_labels"></pre>
+  <h2>VICAR Property Labels</h2>
+  <pre id="prop_labels"></pre>
+  <h2>VICAR History Labels</h2>
+  <pre id="hist_labels"></pre>
+  <script type="text/javascript">
+   //pip install rangehttpserver
+   //python -u -m RangeHTTPServer
+   //open in chrome: http://localhost:8000/parse_vicar.html?relative/path/to/image.VIC
+   const url = window.location.search.slice(1);
+   function setText(id, txt) { document.getElementById(id).innerText = txt; }
+   setText("url", "URL: " + url);
+   fetch(url, { headers: { "Range": "bytes=0-1000"} })
+     .then(response => response.text())
+     .then(pds => {
+       var start = 0;
+       if (!pds.startsWith("LBLSIZE")) {
+         if (pds.startsWith("ODL") || pds.startsWith("PDS")) {
+           const matches = pds.matchAll(/\s*([\^A-Z][A-Z_0-9]*)\s*=\s*(".*"|\S+)/g);
+           const pdsLabels = {};
+           for (const match of matches) {
+             pdsLabels[match[1]] = match[2];
+           }
+           if ("RECORD_BYTES" in pdsLabels && "^IMAGE_HEADER" in pdsLabels) {
+             start = parseInt(pdsLabels["RECORD_BYTES"]) * (parseInt(pdsLabels["^IMAGE_HEADER"] - 1));
+           } else {
+             setText("sys_labels", "error parsing IMG headers");
+           }
+         } else {
+           setText("sys_labels", "input is not VIC or IMG");
+         }
+       }
+       fetch(url, { headers: { "Range": `bytes=${start}-${start + 100}` } })
+         .then(response => response.text())
+         .then(pfx => {
+           const match = pfx.match(/LBLSIZE\s*=\s*(\d+)/);
+           if (match) {
+             const lblsize = parseInt(match[1]);
+             fetch(url, { headers: { "Range": `bytes=${start}-${start + lblsize - 1}` } })
+               .then(response => response.text())
+               .then(hdr => {
+                 //https://www-mipl.jpl.nasa.gov/external/VICAR_file_fmt.pdf
+                 //"[VICAR] Keywords are strings, up to 32 characters in length,
+                 //and consist of uppercase characters, underscores (_), and numbers (but should start with a letter)"
+                 //regex handles these forms: NAME='VAL', NAME='FOO ''BAR'' BAZ', NAME=(VAL) NAME=VAL
+                 //also allows optional space before and after equals sign
+                 const matches = hdr.matchAll(/\s*([A-Z][A-Z_0-9]*)\s*=\s*((?:'(?:[^']*(?:'')?)*')|\([^)]+\)|\S+)/g);
+                 const sys = {}; //dictionary of VICAR system labels
+                 const prop = {}; //dictionary of dictionaries of VICAR property labels
+                 const hist = {}; //dictionary of dictionaries of VICAR history labels
+                 var group = sys;
+                 for (const match of matches) {
+                   const key = match[1], val = match[2];
+                   if (key === "PROPERTY") prop[val] = group = {};
+                   else if (key == "TASK") hist[val] = group = {};
+                   else group[key] = val;
+                 }
+                 setText("sys_labels", JSON.stringify(sys, null, 2));
+                 setText("prop_labels", JSON.stringify(prop, null, 2));
+                 setText("hist_labels", JSON.stringify(hist, null, 2));
+               });
+           } else {
+             setText("sys_labels", "error parsing LBLSIZE");
+           }
+         });
+     });
+  </script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html><html lang="en">
+<!-- this version of the vewer html is for the production server viewer=true route -->
+<!-- also see viewer.html for localhost debug with a generic http server -->
+<head></head>
+<!-- give the page background a slight tint so that certain overlays are more visible -->
+<!-- mask overlays are white with alpha -->
+<!-- arm reachability overlays are white and other colors with alpha -->
+<body style="background-color: #F9F9F9;">
+  <h2>Metadata</h2>
+  <pre id="metadata" style="border: 1px solid black; overflow-x: scroll;"></pre>
+  <h2>Thumb</h2>
+  <img id="thumb" style="border: 1px solid black;">
+  <h2>DZI</h2>
+  <div id="viewer" style="width: 800px; height: 600px; border: 1px solid black;"></div>
+  <script src="{{PATH}}/openseadragon.min.js"></script>
+  <script type="text/javascript">
+   const osd = OpenSeadragon({id: "viewer", showNavigationControl: false, maxZoomLevel: 100,
+                              subPixelRoundingForTransparency: OpenSeadragon.SUBPIXEL_ROUNDING_OCCURRENCES.ALWAYS });
+   function loadDZI(url) {
+     const cfg = OpenSeadragon.DziTileSource.prototype.configure;
+     fetch(url)
+       .then(response => response.text())
+       .then(text => (new window.DOMParser()).parseFromString(text, "text/xml"))
+       .then(xml => osd.addTiledImage({tileSource: new OpenSeadragon.DziTileSource(cfg.apply(osd, [xml, url]))}));
+   }
+   function loadThumb(url) {
+     document.getElementById("thumb").setAttribute("src", url);
+   }
+   function loadMetadata(url) {
+     function replacer(key, val) {
+       if (!Array.isArray(val)) return val;
+       if (val.length === 0 || !Array.isArray(val[0])) return JSON.stringify(val);
+       return val.reduce((rows, row) => [...rows, JSON.stringify(row)], []);
+     }
+     fetch(url, { credentials: 'include' })
+       .then(response => response.json())
+       .then(json => JSON.stringify(json, replacer, 2))
+       .then(text => document.getElementById("metadata").innerText = text);
+   }
+   loadDZI("{{PATH}}?{{PARAMS}}");
+   loadMetadata("{{PATH}}?{{PARAMS}}&metadata=true");
+   loadThumb("{{PATH}}?{{PARAMS}}&thumb=true");
+  </script>
+</body>
+</html>

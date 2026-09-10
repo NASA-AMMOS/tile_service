@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<web-app>
+  <servlet>
+    <servlet-name>TileService</servlet-name>
+    <servlet-class>jpl.mipl.mars.tile_service.TileService</servlet-class>
+    <init-param>
+      <param-name>enable_s3</param-name>
+      <param-value>{{ ENABLE_S3 }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>enable_http</param-name>
+      <param-value>{{ ENABLE_HTTP }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>rdr_url_whitelist_patterns</param-name>
+      <param-value>{{ RDR_URL_WHITELIST_PATTERNS }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>enable_sqs</param-name>
+      <param-value>{{ ENABLE_SQS }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>cache_type</param-name>
+      <param-value>{{ CACHE_TYPE }} </param-value>
+    </init-param>
+    <init-param>
+      <param-name>fs_cache_loc</param-name>
+      <param-value>{{ FS_CACHE_LOC }} </param-value>
+    </init-param>
+    <init-param>
+      <param-name>verbose_tiler</param-name>
+      <param-value>{{ VERBOSE_TILER }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>debug_tiler</param-name>
+      <param-value>{{ DEBUG_TILER }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>format_json</param-name>
+      <param-value>{{ FORMAT_JSON }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>spew_pid</param-name>
+      <param-value>{{ SPEW_PID }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>request_gc</param-name>
+      <param-value>{{ REQUEST_GC }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>mission</param-name>
+      <param-value>{{ MISSION }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>aws_profile</param-name>
+      <param-value>{{ AWS_PROFILE }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>aws_region</param-name>
+      <param-value>{{ AWS_REGION }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>tile_service_queue_name</param-name>
+      <param-value>{{ TILE_SERVICE_QUEUE_NAME }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>fail_queue_name</param-name>
+      <param-value>{{ FAIL_QUEUE_NAME }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>s3_cache_bucket_name</param-name>
+      <param-value>{{ S3_CACHE_BUCKET_NAME }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>s3_cache_loc</param-name>
+      <param-value>{{ S3_CACHE_LOC }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>use_aws_header</param-name>
+      <param-value>{{ TILER_USE_AWS_HEADER }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>cache_s3_credentials</param-name>
+      <param-value>{{ CACHE_S3_CREDENTIALS }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>max_s3_credentials_age</param-name>
+      <param-value>{{ MAX_S3_CREDENTIALS_AGE }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>verify_client_credentials</param-name>
+      <param-value>{{ VERIFY_CLIENT_CREDENTIALS }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>data_url</param-name>
+      <param-value>{{ DATA_URL }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>tile_url</param-name>
+      <param-value>{{ TILE_URL }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>dzi_protocol_override</param-name>
+      <param-value>{{ DZI_PROTOCOL_OVERRIDE }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>dzi_host_override</param-name>
+      <param-value>{{ DZI_HOST_OVERRIDE }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>dzi_port_override</param-name>
+      <param-value>{{ DZI_PORT_OVERRIDE }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>dzi_path_override</param-name>
+      <param-value>{{ DZI_PATH_OVERRIDE }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>dzi_suffix_override</param-name>
+      <param-value>{{ DZI_SUFFIX_OVERRIDE }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>ignore_subdirs</param-name>
+      <param-value>{{ IGNORE_SUBDIRS }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>ignore_exts</param-name>
+      <param-value>{{ IGNORE_EXTS }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>ignore_exceptions</param-name>
+      <param-value>{{ IGNORE_EXCEPTIONS }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>crisp_patterns</param-name>
+      <param-value>{{ CRISP_PATTERNS }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>crisp_suffixen</param-name>
+      <param-value>{{ CRISP_SUFFIXEN }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>icm_patterns</param-name>
+      <param-value>{{ ICM_PATTERNS }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>quicklook_patterns</param-name>
+      <param-value>{{ QUICKLOOK_PATTERNS }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>user_upload_patterns</param-name>
+      <param-value>{{ USER_UPLOAD_PATTERNS }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>fifteen_bit_patterns</param-name>
+      <param-value>{{ FIFTEEN_BIT_PATTERNS }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>preapplied_gamma_patterns</param-name>
+      <param-value>{{ PREAPPLIED_GAMMA_PATTERNS }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>preapplied_8bit_gamma_patterns</param-name>
+      <param-value>{{ PREAPPLIED_8BIT_GAMMA_PATTERNS }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>preapplied_inst_gamma_patterns</param-name>
+      <param-value>{{ PREAPPLIED_INST_GAMMA_PATTERNS }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>tile_format</param-name>
+      <param-value>{{ TILE_FORMAT }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>tile_size</param-name>
+      <param-value>{{ TILE_SIZE }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>tile_overlap</param-name>
+      <param-value>{{ TILE_OVERLAP }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>thumb_height</param-name>
+      <param-value>{{ THUMB_HEIGHT }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>stretch_type</param-name>
+      <param-value>{{ STRETCH_TYPE }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>percent_stretch</param-name>
+      <param-value>{{ PERCENT_STRETCH }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>stretch_low</param-name>
+      <param-value>{{ STRETCH_LOW }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>stretch_high</param-name>
+      <param-value>{{ STRETCH_HIGH }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>mask_black</param-name>
+      <param-value>{{ MASK_BLACK }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>overlay_alpha</param-name>
+      <param-value>{{ OVERLAY_ALPHA }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>unmasked_alpha</param-name>
+      <param-value>{{ UNMASKED_ALPHA }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>masked_alpha</param-name>
+      <param-value>{{ MASKED_ALPHA }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>gamma_mode</param-name>
+      <param-value>{{ GAMMA_MODE }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>dzi_parallelism</param-name>
+      <param-value>{{ DZI_PARALLELISM }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>read_chunk</param-name>
+      <param-value>{{ READ_CHUNK }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>mem_cache_tiles</param-name>
+      <param-value>{{ MEM_CACHE_TILES }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>memory_budget</param-name>
+      <param-value>{{ MEMORY_BUDGET }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>disk_budget</param-name>
+      <param-value>{{ DISK_BUDGET }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>jai_cache</param-name>
+      <param-value>{{ JAI_CACHE }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>pds_tile_width</param-name>
+      <param-value>{{ PDS_TILE_WIDTH }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>pds_tile_height</param-name>
+      <param-value>{{ PDS_TILE_HEIGHT }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>max_rdr_bytes</param-name>
+      <param-value>{{ MAX_RDR_BYTES }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>max_image_bytes</param-name>
+      <param-value>{{ MAX_IMAGE_BYTES }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>lambda_max_rdr_bytes</param-name>
+      <param-value>{{ LAMBDA_MAX_RDR_BYTES }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>lambda_max_image_bytes</param-name>
+      <param-value>{{ LAMBDA_MAX_IMAGE_BYTES }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>lru_page_bytes</param-name>
+      <param-value>{{ LRU_PAGE_BYTES }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>lru_mem_cache_pages</param-name>
+      <param-value>{{ LRU_MEM_CACHE_PAGES }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>lru_disk_cache_pages</param-name>
+      <param-value>{{ LRU_DISK_CACHE_PAGES }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>lru_disk_cache_dir</param-name>
+      <param-value>{{ LRU_DISK_CACHE_DIR }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>large_file_threshold</param-name>
+      <param-value>{{ LARGE_FILE_THRESHOLD }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>large_image_threshold</param-name>
+      <param-value>{{ LARGE_IMAGE_THRESHOLD }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>limit_pds_height</param-name>
+      <param-value>{{ LIMIT_PDS_HEIGHT }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>limit_non_pds_height</param-name>
+      <param-value>{{ LIMIT_NON_PDS_HEIGHT }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>full_load_small_pds</param-name>
+      <param-value>{{ FULL_LOAD_SMALL_PDS }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>tile_window_large_non_pds</param-name>
+      <param-value>{{ TILE_WINDOW_LARGE_NON_PDS }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>tile_window_chunk</param-name>
+      <param-value>{{ TILE_WINDOW_CHUNK }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>min_tile_window_chunk</param-name>
+      <param-value>{{ MIN_TILE_WINDOW_CHUNK }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>max_histogram_bins</param-name>
+      <param-value>{{ MAX_HISTOGRAM_BINS }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>histogram_mode</param-name>
+      <param-value>{{ HISTOGRAM_MODE }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>never_estimate_extrema_from_histogram</param-name>
+      <param-value>{{ NEVER_ESTIMATE_EXTREMA_FROM_HISTOGRAM }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>always_estimate_extrema_from_histogram</param-name>
+      <param-value>{{ ALWAYS_ESTIMATE_EXTREMA_FROM_HISTOGRAM }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>tiler_max_concurrent_requests</param-name>
+      <param-value>{{ TILER_MAX_CONCURRENT_REQUESTS }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>max_concurrent_tasks</param-name>
+      <param-value>{{ MAX_CONCURRENT_TASKS }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>lambda_wait_time</param-name>
+      <param-value>{{ LAMBDA_WAIT_TIME }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>task_pool_wait_time</param-name>
+      <param-value>{{ TASK_POOL_WAIT_TIME }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>max_wait_time</param-name>
+      <param-value>{{ MAX_WAIT_TIME }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>max_zombie_time</param-name>
+      <param-value>{{ MAX_ZOMBIE_TIME }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>task_interlock_time</param-name>
+      <param-value>{{ TASK_INTERLOCK_TIME }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>max_interlock_wait_time</param-name>
+      <param-value>{{ MAX_INTERLOCK_WAIT_TIME }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>serve_tiles_from_tasks</param-name>
+      <param-value>{{ SERVE_TILES_FROM_TASKS }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>filter_image_urls</param-name>
+      <param-value>{{ FILTER_IMAGE_URLS }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>check_etag_value</param-name>
+      <param-value>{{ CHECK_ETAG_VALUE }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>redirect_cached</param-name>
+      <param-value>{{ REDIRECT_CACHED }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>allow_multihop_redirect</param-name>
+      <param-value>{{ ALLOW_MULTIHOP_REDIRECT }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>fs_input_dir</param-name>
+      <param-value>{{ FS_INPUT_DIR }} </param-value>
+    </init-param>
+    <init-param>
+      <param-name>enable_finder</param-name>
+      <param-value>{{ ENABLE_FINDER }}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>finder_max_sol_range_age</param-name>
+      <param-value>{{ FINDER_MAX_SOL_RANGE_AGE }}</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>TileService</servlet-name>
+    <url-pattern>/*</url-pattern>
+  </servlet-mapping>
+</web-app>
