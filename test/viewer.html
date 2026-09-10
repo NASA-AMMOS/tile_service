@@ -1,0 +1,59 @@
+<!DOCTYPE html><html lang="en">
+<!-- this version of the viewer html is meant for localhost debug served by a generic http server -->
+<!-- it can load one DZI, multiple DZI to test overlays, or full cache data including DZI, thumb, and metadata -->
+<!-- the viewer html served by a production server is at webapp/resources/viewer-template.html -->
+<!-- python -m http.server 8080 # python 3 -->
+<!-- python -m SimpleHTTPServer 8080 # python 2 -->
+<head></head>
+<!-- give the page background a slight tint so that certain overlays are more visible -->
+<!-- mask overlays are white with alpha -->
+<!-- arm reachability overlays are white and other colors with alpha -->
+<body style="background-color: #F9F9F9;">
+  <h2>Metadata</h2>
+  <pre id="metadata" style="border: 1px solid black; overflow-x: scroll;"></pre>
+  <h2>Thumb</h2>
+  <img id="thumb" style="border: 1px solid black;">
+  <h2>DZI</h2>
+  <div id="viewer" style="width: 800px; height: 600px; border: 1px solid black;"></div>
+  <script src="openseadragon.min.js"></script>
+  <script type="text/javascript">
+   const osd = OpenSeadragon({id: "viewer", showNavigationControl: false, maxZoomLevel: 100,
+                              subPixelRoundingForTransparency: OpenSeadragon.SUBPIXEL_ROUNDING_OCCURRENCES.ALWAYS });
+   function loadDZI(url) {
+     const cfg = OpenSeadragon.DziTileSource.prototype.configure;
+     fetch(url)
+       .then(response => response.text())
+       .then(text => (new window.DOMParser()).parseFromString(text, "text/xml"))
+       .then(xml => osd.addTiledImage({tileSource: new OpenSeadragon.DziTileSource(cfg.apply(osd, [xml, url]))}));
+   }
+   function loadThumb(url) {
+     document.getElementById("thumb").setAttribute("src", url);
+   }
+   function loadMetadata(url) {
+     function replacer(key, val) {
+       if (!Array.isArray(val)) return val;
+       if (val.length === 0 || !Array.isArray(val[0])) return JSON.stringify(val);
+       return val.reduce((rows, row) => [...rows, JSON.stringify(row)], []);
+     }
+     fetch(url)
+       .then(response => response.json())
+       .then(json => JSON.stringify(json, replacer, 2))
+       .then(text => document.getElementById("metadata").innerText = text);
+   }
+   const urls = window.location.search.slice(1).split(",").filter(s => s.length > 0);
+   if (urls.length === 0) {
+     alert("usage: viewer.html?cache/path[,...] or viewer.html?path/to/image.dzi[,...]");
+   } else {
+     urls.forEach(url => {
+       if (url.endsWith(".dzi")) {
+         loadDZI(url);
+       } else {
+         loadMetadata(url + "/metadata.json");
+         loadThumb(url + "/thumbnail.png");
+         loadDZI(url + "/image.dzi");
+       }
+     });
+   }
+  </script>
+</body>
+</html>
