@@ -1,0 +1,40 @@
+name: "CodeQL Security Scan Configuration"
+
+# Keep the default query suite and add the extended security queries.
+disable-default-queries: false
+
+queries:
+  - uses: security-extended
+
+# Scope note: tile_service is a Java servlet + CLI + Lambda that turns VICAR
+# images into DZI tile pyramids. All of our code lives under src/main/java.
+#
+# src/main/java/gov/nist/isg/pyramidio/ is deliberately NOT excluded. It is a
+# local fork of NIST's pyramidio that is compiled into our artifact; the upstream
+# Maven coordinate is also declared in pom.xml, but these in-tree copies are what
+# actually ship, and Dependabot does not track them. If we don't scan them,
+# nothing does.
+#
+# This database is built with `build-mode: none` (see security-scan.yml): the
+# JPL-internal `mars` and `vicario` dependencies are not publicly resolvable, so
+# CI cannot compile. CodeQL therefore analyzes source without resolved types,
+# which costs some precision on dataflow through library calls.
+paths-ignore:
+  # Build output.
+  - 'target/**'
+
+  # Not code we wrote, or not code at all.
+  - 'docs/**'
+  - 'scripts/**'                          # pandoc/LaTeX helpers for the PDF docs
+  - 'webapp/resources/openseadragon.min.js'  # vendored minified viewer library
+  - 'parse_vicar.html'                    # standalone debugging page
+  - '**/*.min.js'
+
+  # Shell-driven smoke tests, not shipped.
+  - 'test/**'
+
+query-filters:
+  # Style and maintainability suggestions add volume without adding security
+  # signal; SonarQube already covers that ground.
+  - exclude:
+      problem.severity: recommendation
