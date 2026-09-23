@@ -478,3 +478,9 @@ Note on default values: the defaults described here refer to the defaults in the
 * `preapplied_8bit_gamma_patterns`: Defaults to `ECM,ECV`.  Comma separated list of regex for product type three letter codes to force preapplied gamma of 1/2.2 when 8 bit.  Only applies to IMG/VIC.
 * `preapplied_inst_gamma_patterns`: Defaults to empty.  Comma separated list of regex for instrument two letter codes to force preapplied gamma of 1/2.2.  Only applies to IMG/VIC.  Set to e.g. `E.,H.,PC` for EDLCam, Helicopter, and Pixl-MCC.
 
+
+# License
+
+Copyright (c) 2026 California Institute of Technology ("Caltech"). U.S. Government sponsorship acknowledged.
+
+Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for the full text.
