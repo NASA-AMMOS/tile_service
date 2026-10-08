@@ -48,7 +48,8 @@
         <version.aws-lambda-java-events>3.16.1</version.aws-lambda-java-events>
         <version.aws-java-v2-bom>2.42.19</version.aws-java-v2-bom>
         <version.mars>3.8.2-SNAPSHOT</version.mars>
-        <version.vicario>2.7.0-SNAPSHOT</version.vicario>
+        <!-- vicario is open source (https://github.com/NASA-AMMOS/vicario) and published to Maven Central -->
+        <version.vicario>2.7.2</version.vicario>
         <version.tomcat-catalina>9.0.50</version.tomcat-catalina>
 
     </properties>
