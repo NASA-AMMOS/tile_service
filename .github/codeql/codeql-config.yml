@@ -15,10 +15,10 @@ queries:
 # actually ship, and Dependabot does not track them. If we don't scan them,
 # nothing does.
 #
-# This database is built with `build-mode: none` (see security-scan.yml): the
-# JPL-internal `mars` and `vicario` dependencies are not publicly resolvable, so
-# CI cannot compile. CodeQL therefore analyzes source without resolved types,
-# which costs some precision on dataflow through library calls.
+# security-scan.yml compiles the project when every dependency resolves
+# publicly and otherwise falls back to `build-mode: none`, which analyzes source
+# without resolved types and costs some precision on dataflow through library
+# calls. See the header comment there.
 paths-ignore:
   # Build output.
   - 'target/**'

@@ -19,13 +19,16 @@ name: Security-Scan
 # See .github/scripts/fix_sarif_paths.py for the measurements. The script is
 # shared verbatim with astria_ui and mis_rest_service -- fix it in one, copy to all.
 #
-# Why there is no build: this project depends on
-# gov.nasa.jpl.ammos.ids:mars:3.8.2-SNAPSHOT and
-# gov.nasa.jpl.ammos.ids:vicario:2.7.0-SNAPSHOT, which live in JPL Artifactory
-# and cannot be resolved from a public runner. CodeQL therefore uses
-# `build-mode: none`, and SonarQube's Java analyzer runs without bytecode. Both
-# still produce findings, with reduced precision on anything that needs resolved
-# types. See sonar-project.properties for what that costs and how to undo it.
+# Build mode is chosen per run. The "Probe dependencies" step asks Maven to
+# resolve every dependency in pom.xml from public repositories:
+#   resolves -> CodeQL runs with `build-mode: manual`, the project is compiled,
+#               and SonarQube's Java analyzer gets the real bytecode.
+#   fails    -> CodeQL runs with `build-mode: none` and SonarQube analyzes
+#               source only. Both still produce findings, with reduced precision
+#               on anything that needs resolved types.
+# Today the probe fails because gov.nasa.jpl.ammos.ids:mars is not yet
+# published publicly. Once it is, scans switch to the full build on their own;
+# nothing in this file or in sonar-project.properties needs to change.
 #
 # To validate a change to the scan pipeline, dispatch this workflow against the
 # ref you want; see the branch-attribution note on the SonarQube Scan step for
@@ -84,8 +87,7 @@ jobs:
       # pom.xml builds its version as ${semver}${buildnum}${sha1}${changelist};
       # buildnum and sha1 are empty self-closing elements on a normal checkout.
       # Read the properties straight out of the file rather than via
-      # `mvn help:evaluate`, which would make Maven read a project we
-      # deliberately never build here.
+      # `mvn help:evaluate`, which needs the project's dependencies to resolve.
       - name: Extract version from pom.xml
         run: |
           set -euo pipefail
@@ -95,14 +97,39 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Extracted version: $VERSION"
 
+      - name: Set up JDK
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      # Chooses the CodeQL build mode; see the header comment. A failed probe is
+      # expected while any dependency is not publicly resolvable, so it selects
+      # `none` rather than failing the job.
+      - name: Probe dependencies
+        id: probe
+        run: |
+          if mvn -B -q dependency:resolve; then
+            echo "build-mode=manual" >> "$GITHUB_OUTPUT"
+            echo "All dependencies resolved: building."
+          else
+            echo "build-mode=none" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Security-Scan::Some dependencies are not publicly resolvable; analyzing source without a build."
+          fi
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4.38.0
         with:
           languages: java-kotlin
-          # No build: the mars and vicario dependencies are not publicly
-          # resolvable. See the header comment.
-          build-mode: none
+          build-mode: ${{ steps.probe.outputs.build-mode }}
           config-file: ./.github/codeql/codeql-config.yml
+
+      # Runs between init and analyze so CodeQL traces the compilation. Also
+      # leaves target/classes for SonarQube's sonar.java.binaries.
+      - name: Build
+        if: steps.probe.outputs.build-mode == 'manual'
+        run: mvn -B -DskipTests compile
 
       - name: CodeQL Scan
         uses: github/codeql-action/analyze@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4.38.0
@@ -165,9 +192,9 @@ jobs:
           retention-days: 14
 
       # sonar-project.properties sets sonar.java.binaries=target/classes so the
-      # analyzer does not warn about the property being absent. Nothing compiles
-      # here, so the directory has to be created empty.
-      - name: Create empty binaries directory
+      # analyzer does not warn about the property being absent. Without a build
+      # the directory does not exist, so create it (a no-op after a build).
+      - name: Ensure binaries directory exists
         run: mkdir -p target/classes
 
       # Branch attribution. The scanner auto-detects this from the GitHub Actions
