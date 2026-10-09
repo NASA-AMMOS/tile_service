@@ -26,9 +26,10 @@ name: Security-Scan
 #   fails    -> CodeQL runs with `build-mode: none` and SonarQube analyzes
 #               source only. Both still produce findings, with reduced precision
 #               on anything that needs resolved types.
-# Today the probe fails because gov.nasa.jpl.ammos.ids:mars is not yet
-# published publicly. Once it is, scans switch to the full build on their own;
-# nothing in this file or in sonar-project.properties needs to change.
+# While any dependency in pom.xml is not yet publicly available, the probe falls
+# back to `none`. Once every dependency is published, scans switch to the full
+# build on their own; nothing in this file or in sonar-project.properties needs
+# to change.
 #
 # To validate a change to the scan pipeline, dispatch this workflow against the
 # ref you want; see the branch-attribution note on the SonarQube Scan step for
