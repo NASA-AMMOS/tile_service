@@ -96,9 +96,21 @@ public class Utils {
     }
 
     public static boolean hasExt(String url, String[] exts) {
-        int lastDot = url.lastIndexOf('.');
-        if (lastDot >= 0 && lastDot < url.length() - 1) {
-            String ext = url.substring(lastDot + 1).toLowerCase();
+        int pathEnd = url.length();
+        int queryIdx = url.indexOf('?');
+        if (queryIdx >= 0) {
+            pathEnd = Math.min(pathEnd, queryIdx);
+        }
+        int fragmentIdx = url.indexOf('#');
+        if (fragmentIdx >= 0) {
+            pathEnd = Math.min(pathEnd, fragmentIdx);
+        }
+        String path = url.substring(0, pathEnd);
+        int lastSeparator = Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\'));
+        String lastSegment = path.substring(lastSeparator + 1);
+        int lastDot = lastSegment.lastIndexOf('.');
+        if (lastDot >= 0 && lastDot < lastSegment.length() - 1) {
+            String ext = lastSegment.substring(lastDot + 1).toLowerCase();
             for (int i = 0; i < exts.length; i++) {
                 if (exts[i] != null && exts[i].length() > 0 && ext.equals(exts[i].toLowerCase())) {
                     return true;

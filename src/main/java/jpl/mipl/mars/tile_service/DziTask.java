@@ -291,6 +291,11 @@ public class DziTask {
             return false;
         }
 
+        //SSRF filter; HTTPHelper also checks every connection it makes, including redirects
+        if (HTTPHelper.isHTTPUrl(url) && !S3Helper.isS3Url(url) && !HTTPHelper.isSafeUrl(url)) {
+            return false;
+        }
+
         if (rdrUrlWhitelistPatterns.length > 0 && !Utils.anyMatch(rdrUrlWhitelistPatterns, url)) {
             return false;
         }
