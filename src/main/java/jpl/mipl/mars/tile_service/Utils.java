@@ -125,6 +125,12 @@ public class Utils {
         return false;
     }
 
+    //strip a leading (case insensitive) file:// from a local path, e.g. file://foo/bar -> foo/bar
+    //file:///foo/bar -> /foo/bar, i.e. an absolute path
+    public static String stripFileScheme(String path) {
+        return path.toLowerCase().startsWith("file://") ? path.substring(7) : path;
+    }
+
     //replace the extension of the final path segment of url, or append one if it has none
     //any query and fragment are retained unchanged
     public static String setExt(String url, String ext) {

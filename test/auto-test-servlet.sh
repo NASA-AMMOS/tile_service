@@ -129,14 +129,18 @@ test_fail "finder/rdr?image=00051/ids/rdr/ncam/NLF_0051_0671466170_380XYM_N00319
 test_json "finder/label?image=00052/ids/rdr/ncam/NLF_0052_0671564560_659RAS_N0032046NCAM03052_0A0195J02.IMG" f026735cff80df64565ae4f6be1f40b0771702d7
 test_fail "finder/label?image=00052/ids/rdr/ncam/NLF_0052_0671564560_659RAS_N0032046NCAM03052_0A0195J02.NOT" 404
 
-#RDR URL whitelist: localhost-fscache-web.xml allows only http[s] URLs and local paths with no colon
-#this would be 404 if the whitelist were not applied, since it would be treated as a relative path under fs_input_dir
-test_fail "?image=file%3A%2F%2F%2Fetc%2Fpasswd.IMG" 400                            #file:///etc/passwd.IMG
+#file://PATH is the same as PATH, so this hits the same cache entry as the first test_image above
+test_image file://NLG_1618_0810580175_755FDR_N0790198NCAM00518_0A02I3J01.IMG 0790b191c33408a4ae268d678b6077c6a1c079c7
 
-#absolute local paths are rejected with 400, whether or not the file exists
+#RDR URL whitelist: localhost-fscache-web.xml allows only http[s] URLs and local paths with no colon, optionally file://
+test_fail "?image=ftp%3A%2F%2Fexample.com%2Fx.IMG" 400                             #ftp://example.com/x.IMG
+
+#absolute local paths are rejected with 400, with or without file://, whether or not the file exists
 #if they were instead resolved relative to fs_input_dir these would be 404
 test_fail "?image=%2Fetc%2Fpasswd.IMG" 400                                         #/etc/passwd.IMG
+test_fail "?image=file%3A%2F%2F%2Fetc%2Fpasswd.IMG" 400                            #file:///etc/passwd.IMG
 test_fail "?image=$PWD/test/NLG_1618_0810580175_755FDR_N0790198NCAM00518_0A02I3J01.IMG" 400 #exists at this absolute path
+test_fail "?image=file://$PWD/test/NLG_1618_0810580175_755FDR_N0790198NCAM00518_0A02I3J01.IMG" 400 #exists at this absolute path
 
 #SSRF filter: image URLs on non-public hosts are rejected with 400
 #these URLs all pass the whitelist in localhost-fscache-web.xml

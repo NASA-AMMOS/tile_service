@@ -313,9 +313,11 @@ public class DziTask {
 
         //local paths are always resolved relative to fs_input_dir, reject absolute paths to avoid confusion
         //check for leading / explicitly because e.g. /etc/passwd is not absolute on Windows
+        //strip file:// first like DziParams so e.g. file:///etc/passwd is also caught
         if (!isHTTP && !isS3) {
+            String path = Utils.stripFileScheme(url);
             try {
-                if (url.startsWith("/") || Paths.get(url).isAbsolute()) {
+                if (path.startsWith("/") || Paths.get(path).isAbsolute()) {
                     return false;
                 }
             } catch (InvalidPathException ex) { //e.g. NUL character

@@ -15,7 +15,7 @@
     <init-param>
       <param-name>rdr_url_whitelist_patterns</param-name>
       <!-- Example to allow from a single http[s] host, all `s3://` URLs, and all local file paths (no colon):
-           `https?://allow\.from\.com/.*,s3://.*,[^:]*`. -->
+           https?://allow\.from\.com/.*,s3://.*,file://[^:]*,[^:]* -->
       <param-value>{{ RDR_URL_WHITELIST_PATTERNS }}</param-value>
     </init-param>
     <init-param>

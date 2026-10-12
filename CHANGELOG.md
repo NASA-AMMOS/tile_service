@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * http[s] input URLs (other than http[s] S3 URLs) now require a non-empty `rdr_url_whitelist_patterns`.
 * Absolute filesystem input paths are now rejected; previously they were silently resolved relative to `fs_input_dir`.
 * Connect and read timeouts for http[s] inputs.
+* `file://PATH` inputs are now supported and treated the same as `PATH`; previously they were not found.
 
 ## [6.5.8](https://github.com/NASA-AMMOS/tile_service/releases/tag/6.5.8)
 

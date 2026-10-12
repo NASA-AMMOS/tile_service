@@ -341,6 +341,10 @@ public class DziParams {
 
         url = url.replace(File.separator, "/"); //always normalize slashes
 
+        if (!rdrUrlIsS3 && !rdrUrlIsHTTP) {
+            url = Utils.stripFileScheme(url); //file://PATH is the same as PATH
+        }
+
         pfx = DziTask.getVersion() + " [" + url + "] ";
 
         //don't do this here
