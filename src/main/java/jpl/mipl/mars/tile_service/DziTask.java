@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 
 import java.awt.Image;
@@ -291,8 +292,37 @@ public class DziTask {
             return false;
         }
 
+        boolean isHTTP = HTTPHelper.isHTTPUrl(url);
+        boolean isS3 = S3Helper.isS3Url(url);
+
+        //S3 URLs, including http[s]://BUCKET.s3-REGION.amazonaws.com/KEY, are read by the S3 client, not HTTPHelper,
+        //and with a PrivateLink interface endpoint their hostnames legitimately resolve to private addresses
+        if (isHTTP && !isS3) {
+            //SSRF filter; HTTPHelper also checks every connection it makes, including redirects
+            if (!HTTPHelper.isSafeUrl(url)) {
+                return false;
+            }
+            if (rdrUrlWhitelistPatterns.length == 0) {
+                return false; //only allow whitelisted http[s] RDR URLs
+            }
+        }
+
         if (rdrUrlWhitelistPatterns.length > 0 && !Utils.anyMatch(rdrUrlWhitelistPatterns, url)) {
             return false;
+        }
+
+        //local paths are always resolved relative to fs_input_dir, reject absolute paths to avoid confusion
+        //check for leading / explicitly because e.g. /etc/passwd is not absolute on Windows
+        //strip file:// first like DziParams so e.g. file:///etc/passwd is also caught
+        if (!isHTTP && !isS3) {
+            String path = Utils.stripFileScheme(url);
+            try {
+                if (path.startsWith("/") || Paths.get(path).isAbsolute()) {
+                    return false;
+                }
+            } catch (InvalidPathException ex) { //e.g. NUL character
+                return false;
+            }
         }
 
         if (securityOnly) {

@@ -103,18 +103,18 @@ sleep 10
 
 test_alive
 
-test_image NLG_1618_0810580175_755FDR_N0790198NCAM00518_0A02I3J01.IMG 79536112803cbb909fd9df97e86a088587fc0b60
-test_image NLF_1616_0810395357_230XYZ_N0790198NCAM14615_0A0195J01.IMG e0c7883df604173c1f4477a29db337f7870db554
-test_image N_LRGB_1622XRZS_0790198_CYL_L_AUTOGENJ01.IMG               446673bf0a9febe1dec670006b0f01b69cb3251d
-test_image ZLF_1618_0810574341_473FDR_N0790198ZCAM09697_0340LMJ01.IMG bec8f71d9c5158e75e5fece94f815db3d88414b1
-test_image ZLF_1618_0810574647_473FDR_N0790198ZCAM09697_0340LMJ01.IMG 536b54ac3912de040c508384fa3d47a92707bac1
-test_image ZLF_1618_0810575350_473FDR_N0790198ZCAM09697_0340LMJ01.IMG 7c284a02dad5a064f2cd683d9407527e04a48bf4
-test_image ZLF_1618_0810575881_473FDR_N0790198ZCAM09697_0340LMJ01.IMG 6f26800253cbce8acb2ebe217b1ae085423d2c9e
-test_image Z_LRGB_1618XRZS_0790198_ORR_L_45M01CMJ08.IMG               957d20261dec6db050b0a716d11db3f69a8dec82
+test_image NLG_1618_0810580175_755FDR_N0790198NCAM00518_0A02I3J01.IMG 0790b191c33408a4ae268d678b6077c6a1c079c7
+test_image NLF_1616_0810395357_230XYZ_N0790198NCAM14615_0A0195J01.IMG 945960bfaf532277b0e48013421e9323da2047d2
+test_image N_LRGB_1622XRZS_0790198_CYL_L_AUTOGENJ01.IMG               5d738126f1d796d4aa0d8eb1269a72a72855838f
+test_image ZLF_1618_0810574341_473FDR_N0790198ZCAM09697_0340LMJ01.IMG 3f380efa9dc6ab116c9e2a593652bec4d736cbb3
+test_image ZLF_1618_0810574647_473FDR_N0790198ZCAM09697_0340LMJ01.IMG d43612e6c512fa742b2330d0e600c3eb4e2c38d9
+test_image ZLF_1618_0810575350_473FDR_N0790198ZCAM09697_0340LMJ01.IMG 5f34138636aa0254a76518bd62fef09033e7689a
+test_image ZLF_1618_0810575881_473FDR_N0790198ZCAM09697_0340LMJ01.IMG 6b07603ef210678713dc78be90358571082663a5
+test_image Z_LRGB_1618XRZS_0790198_ORR_L_45M01CMJ08.IMG               661a2f948fc17737be4954fc9dde13170e427a36
 
-test_image NLF_1616_0810395357_230XYZ_N0790198NCAM14615_0A0195J01.IMG ef9d202da9e9ff01efc8de72b17ed5f66e7ea3ca "&overlayPreference=xyz%3AcontourInterval%3D%5B0.1,0.3%5D" 
+test_image NLF_1616_0810395357_230XYZ_N0790198NCAM14615_0A0195J01.IMG 95416015d4757930716e287e8d81efc428a20fc0 "&overlayPreference=xyz%3AcontourInterval%3D%5B0.1,0.3%5D" 
 
-test_image ZLF_1618_0810575881_473FDR_N0790198ZCAM09697_0340LMJ01.IMG a859511e2e52de2fb02cc29c172eee7b7579b514 "&extremaStretch=true&stretchLow=1000&stretchHigh=3000"
+test_image ZLF_1618_0810575881_473FDR_N0790198ZCAM09697_0340LMJ01.IMG 5dfc42f6030e383b951a832f39e16c3d2e49f961 "&extremaStretch=true&stretchLow=1000&stretchHigh=3000"
 
 test_json "finder/solrange" a7b2f2b865a55adc05a02fedf40049389f76f7c7
 test_json "finder/edrs?sol=50" bd44ee0afbd93ee64dc6ad294e52e2f6a3c29a75
@@ -128,5 +128,43 @@ test_json "finder/rdr?image=00051/ids/rdr/ncam/NLF_0051_0671466170_380XYM_N00319
 test_fail "finder/rdr?image=00051/ids/rdr/ncam/NLF_0051_0671466170_380XYM_N0031950NCAM00408_0A00LLJ01.NOT" 404
 test_json "finder/label?image=00052/ids/rdr/ncam/NLF_0052_0671564560_659RAS_N0032046NCAM03052_0A0195J02.IMG" f026735cff80df64565ae4f6be1f40b0771702d7
 test_fail "finder/label?image=00052/ids/rdr/ncam/NLF_0052_0671564560_659RAS_N0032046NCAM03052_0A0195J02.NOT" 404
+
+#file://PATH is the same as PATH, so this hits the same cache entry as the first test_image above
+test_image file://NLG_1618_0810580175_755FDR_N0790198NCAM00518_0A02I3J01.IMG 0790b191c33408a4ae268d678b6077c6a1c079c7
+
+#RDR URL whitelist: localhost-fscache-web.xml allows only http[s] URLs and local paths with no colon, optionally file://
+test_fail "?image=ftp%3A%2F%2Fexample.com%2Fx.IMG" 400                             #ftp://example.com/x.IMG
+
+#absolute local paths are rejected with 400, with or without file://, whether or not the file exists
+#if they were instead resolved relative to fs_input_dir these would be 404
+test_fail "?image=%2Fetc%2Fpasswd.IMG" 400                                         #/etc/passwd.IMG
+test_fail "?image=file%3A%2F%2F%2Fetc%2Fpasswd.IMG" 400                            #file:///etc/passwd.IMG
+test_fail "?image=$PWD/test/NLG_1618_0810580175_755FDR_N0790198NCAM00518_0A02I3J01.IMG" 400 #exists at this absolute path
+test_fail "?image=file://$PWD/test/NLG_1618_0810580175_755FDR_N0790198NCAM00518_0A02I3J01.IMG" 400 #exists at this absolute path
+
+#SSRF filter: image URLs on non-public hosts are rejected with 400
+#these URLs all pass the whitelist in localhost-fscache-web.xml
+#URLs are percent encoded, also [] would otherwise be interpreted by curl as globs
+test_fail "?image=http%3A%2F%2Flocalhost%3A8080%2Fx.IMG" 400                       #http://localhost:8080/x.IMG
+test_fail "?image=http%3A%2F%2FLOCALHOST.%3A8080%2Fx.IMG" 400                      #http://LOCALHOST.:8080/x.IMG
+test_fail "?image=http%3A%2F%2Ffoo.localhost%2Fx.IMG" 400                          #http://foo.localhost/x.IMG
+test_fail "?image=http%3A%2F%2F127.0.0.1%3A8080%2Fx.IMG" 400                       #http://127.0.0.1:8080/x.IMG
+test_fail "?image=http%3A%2F%2F127.1%2Fx.IMG" 400                                  #http://127.1/x.IMG
+test_fail "?image=http%3A%2F%2F2130706433%2Fx.IMG" 400                             #http://2130706433/x.IMG (127.0.0.1)
+test_fail "?image=http%3A%2F%2F0.0.0.0%2Fx.IMG" 400                                #http://0.0.0.0/x.IMG
+test_fail "?image=http%3A%2F%2F10.1.2.3%2Fx.IMG" 400                               #http://10.1.2.3/x.IMG
+test_fail "?image=http%3A%2F%2F172.16.0.1%2Fx.IMG" 400                             #http://172.16.0.1/x.IMG
+test_fail "?image=http%3A%2F%2F192.168.1.1%2Fx.IMG" 400                            #http://192.168.1.1/x.IMG
+test_fail "?image=http%3A%2F%2F100.100.100.200%2Fx.IMG" 400                        #http://100.100.100.200/x.IMG (CGNAT)
+test_fail "?image=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fx.IMG" 400   #http://169.254.169.254/latest/meta-data/x.IMG
+test_fail "?image=http%3A%2F%2Fmetadata.google.internal%2Fx.IMG" 400               #http://metadata.google.internal/x.IMG
+test_fail "?image=http%3A%2F%2Fexample.com%40127.0.0.1%2Fx.IMG" 400                #http://example.com@127.0.0.1/x.IMG
+test_fail "?image=http%3A%2F%2F%5B%3A%3A1%5D%3A8080%2Fx.IMG" 400                   #http://[::1]:8080/x.IMG
+test_fail "?image=http%3A%2F%2F%5Bfe80%3A%3A1%5D%2Fx.IMG" 400                      #http://[fe80::1]/x.IMG
+test_fail "?image=http%3A%2F%2F%5Bfd00%3Aec2%3A%3A254%5D%2Fx.IMG" 400              #http://[fd00:ec2::254]/x.IMG (AWS IPv6 metadata)
+test_fail "?image=http%3A%2F%2F%5B%3A%3Affff%3A169.254.169.254%5D%2Fx.IMG" 400     #http://[::ffff:169.254.169.254]/x.IMG
+test_fail "?image=http%3A%2F%2F%5B64%3Aff9b%3A%3Aa9fe%3Aa9fe%5D%2Fx.IMG" 400       #http://[64:ff9b::a9fe:a9fe]/x.IMG (NAT64)
+test_fail "?image=http%3A%2F%2F%5B2002%3Aa9fe%3Aa9fe%3A%3A%5D%2Fx.IMG" 400         #http://[2002:a9fe:a9fe::]/x.IMG (6to4)
+test_fail "?image=http%3A%2F%2Fno-such-host.invalid%2Fx.IMG" 400                   #http://no-such-host.invalid/x.IMG
 
 echo "SUCCESS"

@@ -533,13 +533,53 @@ public class S3Helper implements AutoCloseable {
             return false;
         }
 
-        int slash = url.indexOf("/");
-        if (slash <= 0) {
+        //the authority ends at the first /, ?, or #
+        //e.g. the host of http://evil.net?.s3.amazonaws.com/KEY is evil.net
+        int end = 0;
+        while (end < url.length() && "/?#".indexOf(url.charAt(end)) < 0) {
+            end++;
+        }
+        if (end == 0 || end == url.length() || url.charAt(end) != '/') {
+            return false; //no host or no path
+        }
+
+        String host = url.substring(0, end);
+        host = host.substring(host.lastIndexOf('@') + 1); //strip userinfo
+        int colon = host.indexOf(':');
+        if (colon >= 0) {
+            host = host.substring(0, colon); //strip port
+        }
+
+        return isS3Host(host);
+    }
+
+    public static final int MAX_HOST_LENGTH = 253; //DNS limit
+
+    //true iff host (already lower case) is like [BUCKET.]s3[.REGION].amazonaws.com or [BUCKET.]s3-REGION.amazonaws.com
+    //also matches e.g. dualstack and website endpoints
+    //host labels must be delimited, e.g. evils3.amazonaws.com and s3.evilamazonaws.com do not match
+    //this checks labels in linear time rather than using a regex, which could backtrack badly on adversarial input
+    private static boolean isS3Host(String host) {
+
+        final String suffix = ".amazonaws.com";
+        if (host.length() > MAX_HOST_LENGTH || !host.endsWith(suffix)) {
             return false;
         }
 
-        String host = url.substring(0, slash);
-        return host.endsWith("amazonaws.com") && host.contains("s3");
+        for (int i = 0; i < host.length(); i++) {
+            char c = host.charAt(i);
+            if (!((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-')) {
+                return false;
+            }
+        }
+
+        //some label before amazonaws.com must be s3 or start with s3-
+        for (String label : host.substring(0, host.length() - suffix.length()).split("\\.", -1)) {
+            if (label.equals("s3") || (label.startsWith("s3-") && label.length() > 3)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static String getS3Url(String url) {

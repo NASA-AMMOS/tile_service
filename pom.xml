@@ -16,7 +16,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <semver>6.5.8</semver>
+        <semver>6.6.0</semver>
         <buildnum/>
         <sha1/>
         <changelist>-SNAPSHOT</changelist>

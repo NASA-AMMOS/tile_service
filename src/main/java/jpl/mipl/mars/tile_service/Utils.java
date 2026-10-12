@@ -95,10 +95,27 @@ public class Utils {
         return path;
     }
 
+    //index of the end of the path part of url, i.e. the start of the query or fragment if any, else url.length()
+    private static int pathEnd(String url) {
+        int pathEnd = url.length();
+        int queryIdx = url.indexOf('?');
+        if (queryIdx >= 0) {
+            pathEnd = Math.min(pathEnd, queryIdx);
+        }
+        int fragmentIdx = url.indexOf('#');
+        if (fragmentIdx >= 0) {
+            pathEnd = Math.min(pathEnd, fragmentIdx);
+        }
+        return pathEnd;
+    }
+
     public static boolean hasExt(String url, String[] exts) {
-        int lastDot = url.lastIndexOf('.');
-        if (lastDot >= 0 && lastDot < url.length() - 1) {
-            String ext = url.substring(lastDot + 1).toLowerCase();
+        String path = url.substring(0, pathEnd(url));
+        int lastSeparator = Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\'));
+        String lastSegment = path.substring(lastSeparator + 1);
+        int lastDot = lastSegment.lastIndexOf('.');
+        if (lastDot >= 0 && lastDot < lastSegment.length() - 1) {
+            String ext = lastSegment.substring(lastDot + 1).toLowerCase();
             for (int i = 0; i < exts.length; i++) {
                 if (exts[i] != null && exts[i].length() > 0 && ext.equals(exts[i].toLowerCase())) {
                     return true;
@@ -108,9 +125,23 @@ public class Utils {
         return false;
     }
 
+    //strip a leading (case insensitive) file:// from a local path, e.g. file://foo/bar -> foo/bar
+    //file:///foo/bar -> /foo/bar, i.e. an absolute path
+    public static String stripFileScheme(String path) {
+        return path.toLowerCase().startsWith("file://") ? path.substring(7) : path;
+    }
+
+    //replace the extension of the final path segment of url, or append one if it has none
+    //any query and fragment are retained unchanged
     public static String setExt(String url, String ext) {
-        int lastDot = url.lastIndexOf('.');
-        return (lastDot >= 0 ? url.substring(0, lastDot) : url) + "." + ext;
+        int pathEnd = pathEnd(url);
+        String path = url.substring(0, pathEnd);
+        int lastSeparator = Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\'));
+        int lastDot = path.lastIndexOf('.');
+        if (lastDot > lastSeparator) { //dot is in the final path segment
+            path = path.substring(0, lastDot);
+        }
+        return path + "." + ext + url.substring(pathEnd);
     }
 
     public static float parseFloat(String str, float def, Predicate<Number> pred) {

@@ -125,7 +125,7 @@ If the requested path is in the form of a cached tile image, that tile image is 
 
 ## Image Requests
 
-A request like any of the following requests conversion of the image at the given location on S3, HTTP(S), or the server filesystem (latter when `image=PATH`):
+A request like any of the following requests conversion of the image at the given location on S3, HTTP(S), or the server filesystem (latter when `image=PATH` or `image=file://PATH`):
 
 * `https://SERVER/image_tiler?image=s3://BUCKET/KEY`
 * `https://SERVER/image_tiler?image=http[s]://BUCKET.s3-REGION.amazonaws.com/KEY`
@@ -134,9 +134,16 @@ A request like any of the following requests conversion of the image at the give
 * `https://SERVER/image_tiler?image=http[s]://s3-REGION.amazonaws.com/BUCKET/KEY`
 * `https://SERVER/image_tiler?image=http[s]://s3.amazonaws.com/BUCKET/KEY`
 * `https://SERVER/image_tiler?image=http[s]://PATH`
+* `https://SERVER/image_tiler?image=file://PATH`
 * `https://SERVER/image_tiler?image=PATH`
 
-If `REGION` is included and differs from the region of the AWS credentials (see below) the query will likely fail.  `..` is disallowed in `KEY` and `PATH`.
+If `REGION` is included and differs from the region of the AWS credentials (see below) the query will likely fail.
+
+`..` is disallowed in `KEY` and `PATH`.
+
+`http[s]://PATH` URLs must not resolve to a loopback, private, link local, or other non-public address, including after redirects.
+
+For the REST service `PATH` must also be relative to `fs_input_dir`, and `http[s]://PATH` URLs must match `rdr_url_whitelist_patterns` (see below).
 
 If the requested conversion has not already been cached it is initiated and the call will block until the product has been created.
 
@@ -388,7 +395,7 @@ Note on default values: the defaults described here refer to the defaults in the
 * `mission`: one of `MSL`, `M20`, `M2020`, or `CADRE`.  Defaults to `M20`.  Used to determine the format for parsing input filenames as mission product IDs when `rdr=TYPE` is absent.
 * `enable_s3`: Must be `true`, `false`, or `auto`.  Defaults to `true`.  Enables reading inputs from and saving cached results to S3.
 * `enable_http`: Must be `true`, `false`, or `auto`.  Defaults to `true`.  Enables reading inputs from http[s] URLs. 
-* `rdr_url_whitelist_patterns`: Defaults to empty, meaning allow all.  Comma separated list of URL regex to whitelist RDR URLs.  If this is empty no whitelist is applied, but the `enable_s3` and `enable_http` settings are still respected.  This whitelist is for security and cannot be disabled with the `force=true` or `filter=false` request options.
+* `rdr_url_whitelist_patterns`: Defaults to empty, which disables http[s] URLs but allows all S3 URLs and filesystem paths.  Comma separated list of regex to whitelist URLs and filesystem paths.  Patterns should include the / after the host, e.g. `https://data\.example\.com/.*`, not `https://data\.example\.com.*` which would match `https://data.example.com.evil.net/x`.  The whitelist can't be bypassed with `force=true` or `filter=false`.   Example to allow from a single http[s] host, all `s3://` URLs, and all relative local file paths (no colon) with or without `file://`: `https?://allow\.from\.com/.*,s3://.*,file://[^:]*,[^:]*`.
 * `enable_sqs`: Must be `true`, `false`, or `auto`.  Defaults to `false`.  Enables the Lambda or REST service to use SQS features (not counting the normal input and fail queue for the Lambda).  Ignored for CLI.
 * `enable_sqs_heartbeat`: defaults to false.  Only applies to Lambda.  Enables SQS message visibility timeout heartbeating in the Lambda.  This will keep a message invisible for approximately as long as the Lambda is working on it, but not too much longer.  Requires `sqs:GetQueueUrl` and `sqs:ChangeMessageVisibility` permissions.
 * `sqs_retries`: Defaults to 3.  Max number of retries to process a DZI for request received by SQS.  Only applies to REST service.
@@ -401,7 +408,7 @@ Note on default values: the defaults described here refer to the defaults in the
 * `dzi_suffix_override`: If not null, empty, or `auto`, this overrides the path suffix in the URL in DZI xml files (except when using the `data` proxy mode).  Empty for no suffix, otherwise this should start with / and not end with /.
 * `redirect_cached`: Must be `true`, `false`, or `auto`.  Defaults to `true`.  Applies only to REST service.  Instead of proxying requests for already cached files (image tiles and metadata files), redirect the request.  The DZI xml files are always served by the REST service, but the embedded URL to the tiles is modified depending on the setting of `redirect_cached`, `data_url`, `tile_url`, the cache type (S3 or filesystem), the `proxy` request parameter, `serve_tiles_from_tasks`, and whether the image is still being processed.
 * `allow_multihop_redirect`: Must be `true`, `false`, or `auto`.  Defaults to `false`.  Allow the server to respond to requests for image tiles or metadata files with a data proxy URL (using `data_url`) that will in turn (typically) redirect to a presigned https S3 URL.  Such multhop redirects may cause CORS errors.  When `false` such URLs will instead be formulated as direct presigned https S3 URLs using the server credentials to access the cache bucket.
-* `fs_input_dir`: optional content root for filesystem input images.  Applies only to REST service.  Local filesystem access is disabled if this is null or empty.
+* `fs_input_dir`: optional content root for filesystem input images.  Applies only to REST service.  Local filesystem access is disabled if this is null or empty.  Filesystem input paths, including `file://` URLs, are resolved relative to this; absolute paths (e.g. starting with `/` or `file:///`) are rejected.
 * `enable_finder`: Defaults to false.  Enable the [finder API](#finder-api).  Requires `fs_input_dir` to also be set.  Currently only implemented for M2020 and CADRE.
 * `max_sol_range_age`: Defaults to 300 (5 minutes).  Maximum time between recomputing available sols in [finder API](#finder-api).  Non-positive forces recompute for each `solrange` query.
 * `cache_type`: must be `s3` or `fs`.  Empty, null, or `auto` defaults to `s3`.

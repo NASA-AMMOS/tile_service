@@ -13,4 +13,4 @@ if [[ $# -gt 1 ]]; then
   cl="-cl $2"
 fi
 
-java -jar test/image_tiler.jar -i test/$1 -m M20 -fc -pc -q $cl 2>/dev/null
+java -jar test/image_tiler.jar -i test/${1##*/} -m M20 -fc -pc -q $cl 2>/dev/null

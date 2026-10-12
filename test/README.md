@@ -37,7 +37,7 @@ Run `test/build-jar.sh`, then `test/auto-test-cli.sh`.  It will print SUCCESS or
 
 Run `test/download-tomcat.sh` to download Apache Tomcat 9.x and unpack it in `test/tomcat/`.
 
-Run `test/build-war.sh` to build `image_tiler.war` using the `webapp/WEB-INF/localhost-fscache-web.xml` configuration and install it to `test/tomcat/webapps/`.  This will allow processing of local image files under `test/` as well as image files from `http://` URLs.  Computed tilings will be saved locally under `test/cache/`.
+Run `test/build-war.sh` to build `image_tiler.war` using the `webapp/WEB-INF/localhost-fscache-web.xml` configuration and install it to `test/tomcat/webapps/`.  This will allow processing of local image files under `test/` as well as image files from http[s] URLs on public hosts (see `rdr_url_whitelist_patterns` in that file).  Computed tilings will be saved locally under `test/cache/`.
 
 Optionally run `test/clear-cache.sh` to clear existing cached tilings.
 

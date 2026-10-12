@@ -118,9 +118,7 @@ public class LRUCacheImageInputStream extends ImageInputStreamImpl {
             s3Key = null;
             srcSize = HTTPHelper.getSize(url);
         } else {
-            if (url.toLowerCase().startsWith("file://")) {
-                url = url.substring(7);
-            }
+            url = Utils.stripFileScheme(url);
             this.s3 = null;
             this.isHTTP = false;
             s3Bucket = null;
