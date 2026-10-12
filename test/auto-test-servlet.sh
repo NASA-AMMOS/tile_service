@@ -129,4 +129,28 @@ test_fail "finder/rdr?image=00051/ids/rdr/ncam/NLF_0051_0671466170_380XYM_N00319
 test_json "finder/label?image=00052/ids/rdr/ncam/NLF_0052_0671564560_659RAS_N0032046NCAM03052_0A0195J02.IMG" f026735cff80df64565ae4f6be1f40b0771702d7
 test_fail "finder/label?image=00052/ids/rdr/ncam/NLF_0052_0671564560_659RAS_N0032046NCAM03052_0A0195J02.NOT" 404
 
+#SSRF filter: image URLs on non-public hosts are rejected with 400
+#URLs are percent encoded, also [] would otherwise be interpreted by curl as globs
+test_fail "?image=http%3A%2F%2Flocalhost%3A8080%2Fx.IMG" 400                       #http://localhost:8080/x.IMG
+test_fail "?image=http%3A%2F%2FLOCALHOST.%3A8080%2Fx.IMG" 400                      #http://LOCALHOST.:8080/x.IMG
+test_fail "?image=http%3A%2F%2Ffoo.localhost%2Fx.IMG" 400                          #http://foo.localhost/x.IMG
+test_fail "?image=http%3A%2F%2F127.0.0.1%3A8080%2Fx.IMG" 400                       #http://127.0.0.1:8080/x.IMG
+test_fail "?image=http%3A%2F%2F127.1%2Fx.IMG" 400                                  #http://127.1/x.IMG
+test_fail "?image=http%3A%2F%2F2130706433%2Fx.IMG" 400                             #http://2130706433/x.IMG (127.0.0.1)
+test_fail "?image=http%3A%2F%2F0.0.0.0%2Fx.IMG" 400                                #http://0.0.0.0/x.IMG
+test_fail "?image=http%3A%2F%2F10.1.2.3%2Fx.IMG" 400                               #http://10.1.2.3/x.IMG
+test_fail "?image=http%3A%2F%2F172.16.0.1%2Fx.IMG" 400                             #http://172.16.0.1/x.IMG
+test_fail "?image=http%3A%2F%2F192.168.1.1%2Fx.IMG" 400                            #http://192.168.1.1/x.IMG
+test_fail "?image=http%3A%2F%2F100.100.100.200%2Fx.IMG" 400                        #http://100.100.100.200/x.IMG (CGNAT)
+test_fail "?image=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fx.IMG" 400   #http://169.254.169.254/latest/meta-data/x.IMG
+test_fail "?image=http%3A%2F%2Fmetadata.google.internal%2Fx.IMG" 400               #http://metadata.google.internal/x.IMG
+test_fail "?image=http%3A%2F%2Fexample.com%40127.0.0.1%2Fx.IMG" 400                #http://example.com@127.0.0.1/x.IMG
+test_fail "?image=http%3A%2F%2F%5B%3A%3A1%5D%3A8080%2Fx.IMG" 400                   #http://[::1]:8080/x.IMG
+test_fail "?image=http%3A%2F%2F%5Bfe80%3A%3A1%5D%2Fx.IMG" 400                      #http://[fe80::1]/x.IMG
+test_fail "?image=http%3A%2F%2F%5Bfd00%3Aec2%3A%3A254%5D%2Fx.IMG" 400              #http://[fd00:ec2::254]/x.IMG (AWS IPv6 metadata)
+test_fail "?image=http%3A%2F%2F%5B%3A%3Affff%3A169.254.169.254%5D%2Fx.IMG" 400     #http://[::ffff:169.254.169.254]/x.IMG
+test_fail "?image=http%3A%2F%2F%5B64%3Aff9b%3A%3Aa9fe%3Aa9fe%5D%2Fx.IMG" 400       #http://[64:ff9b::a9fe:a9fe]/x.IMG (NAT64)
+test_fail "?image=http%3A%2F%2F%5B2002%3Aa9fe%3Aa9fe%3A%3A%5D%2Fx.IMG" 400         #http://[2002:a9fe:a9fe::]/x.IMG (6to4)
+test_fail "?image=http%3A%2F%2Fno-such-host.invalid%2Fx.IMG" 400                   #http://no-such-host.invalid/x.IMG
+
 echo "SUCCESS"
