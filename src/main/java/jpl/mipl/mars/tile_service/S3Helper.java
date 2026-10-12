@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import java.util.LinkedHashMap;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 import java.lang.ref.SoftReference;
 
@@ -533,14 +534,30 @@ public class S3Helper implements AutoCloseable {
             return false;
         }
 
-        int slash = url.indexOf("/");
-        if (slash <= 0) {
-            return false;
+        //the authority ends at the first /, ?, or #
+        //e.g. the host of http://evil.net?.s3.amazonaws.com/KEY is evil.net
+        int end = 0;
+        while (end < url.length() && "/?#".indexOf(url.charAt(end)) < 0) {
+            end++;
+        }
+        if (end == 0 || end == url.length() || url.charAt(end) != '/') {
+            return false; //no host or no path
         }
 
-        String host = url.substring(0, slash);
-        return host.endsWith("amazonaws.com") && host.contains("s3");
+        String host = url.substring(0, end);
+        host = host.substring(host.lastIndexOf('@') + 1); //strip userinfo
+        int colon = host.indexOf(':');
+        if (colon >= 0) {
+            host = host.substring(0, colon); //strip port
+        }
+
+        return S3_HOST_PATTERN.matcher(host).matches();
     }
+
+    //[BUCKET.]s3[.-][REGION.]amazonaws.com, also matches e.g. dualstack and website endpoints
+    //host labels must be delimited, e.g. evil-s3amazonaws.com and s3.evilamazonaws.com do not match
+    private static final Pattern S3_HOST_PATTERN =
+        Pattern.compile("([a-z0-9.-]+\\.)?s3[.-]([a-z0-9.-]+\\.)?amazonaws\\.com");
 
     public static String getS3Url(String url) {
         return getS3Url(new AmazonS3URI(url));

@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 
 import java.awt.Image;
@@ -292,12 +293,30 @@ public class DziTask {
         }
 
         //SSRF filter; HTTPHelper also checks every connection it makes, including redirects
-        if (HTTPHelper.isHTTPUrl(url) && !HTTPHelper.isSafeUrl(url)) {
+        boolean isHTTP = HTTPHelper.isHTTPUrl(url);
+        boolean isS3 = S3Helper.isS3Url(url);
+        if (isHTTP && !HTTPHelper.isSafeUrl(url)) {
             return false;
+        }
+
+        if (isHTTP && !isS3 && rdrUrlWhitelistPatterns.length == 0) {
+            return false; //only allow whitelisted http[s] RDR URLs
         }
 
         if (rdrUrlWhitelistPatterns.length > 0 && !Utils.anyMatch(rdrUrlWhitelistPatterns, url)) {
             return false;
+        }
+
+        //local paths are always resolved relative to fs_input_dir, reject absolute paths to avoid confusion
+        //check for leading / explicitly because e.g. /etc/passwd is not absolute on Windows
+        if (!isHTTP && !isS3) {
+            try {
+                if (url.startsWith("/") || Paths.get(url).isAbsolute()) {
+                    return false;
+                }
+            } catch (InvalidPathException ex) { //e.g. NUL character
+                return false;
+            }
         }
 
         if (securityOnly) {

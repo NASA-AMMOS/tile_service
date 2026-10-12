@@ -26,7 +26,8 @@
     </init-param>
     <init-param>
       <param-name>rdr_url_whitelist_patterns</param-name>
-      <param-value></param-value>
+      <!-- allow any http[s] URL (still subject to SSRF filter) and any local path with no colon (absolute local paths are rejected regardless, local paths are relative to fs_input_dir) -->
+      <param-value>https?://.*,[^:]*</param-value>
     </init-param>
     <init-param>
       <param-name>aws_profile</param-name>
