@@ -295,12 +295,16 @@ public class DziTask {
         //SSRF filter; HTTPHelper also checks every connection it makes, including redirects
         boolean isHTTP = HTTPHelper.isHTTPUrl(url);
         boolean isS3 = S3Helper.isS3Url(url);
-        if (isHTTP && !HTTPHelper.isSafeUrl(url)) {
-            return false;
-        }
 
-        if (isHTTP && !isS3 && rdrUrlWhitelistPatterns.length == 0) {
-            return false; //only allow whitelisted http[s] RDR URLs
+        //S3 URLs, including http[s]://BUCKET.s3-REGION.amazonaws.com/KEY, are read by the S3 client, not HTTPHelper,
+        //and with a PrivateLink interface endpoint their hostnames legitimately resolve to private addresses
+        if (isHTTP && !isS3) {
+            if (!HTTPHelper.isSafeUrl(url)) {
+                return false;
+            }
+            if (rdrUrlWhitelistPatterns.length == 0) {
+                return false; //only allow whitelisted http[s] RDR URLs
+            }
         }
 
         if (rdrUrlWhitelistPatterns.length > 0 && !Utils.anyMatch(rdrUrlWhitelistPatterns, url)) {
