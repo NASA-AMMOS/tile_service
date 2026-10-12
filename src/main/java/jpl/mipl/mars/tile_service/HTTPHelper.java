@@ -21,6 +21,11 @@ public class HTTPHelper {
 
     public static final int MAX_REDIRECTS = 5;
 
+    //HttpURLConnection waits forever by default, which would let a slow or malicious server hang request threads
+    //the read timeout is per read, not a limit on the total time to read a response
+    public static final int CONNECT_TIMEOUT_MS = 10 * 1000;
+    public static final int READ_TIMEOUT_MS = 30 * 1000;
+
     //open a connection to url, following up to MAX_REDIRECTS redirects
     //the target host of every hop is checked with isSafeHost() to avoid server side request forgery (SSRF)
     //this is checked on every connection, not just once up front, to limit DNS rebinding attacks
@@ -37,6 +42,8 @@ public class HTTPHelper {
             }
             HttpURLConnection c = (HttpURLConnection)u.openConnection();
             c.setInstanceFollowRedirects(false); //we follow redirects ourselves so we can check each hop
+            c.setConnectTimeout(CONNECT_TIMEOUT_MS);
+            c.setReadTimeout(READ_TIMEOUT_MS); //also applies to subsequent reads of the response body
             c.setRequestMethod(method);
             if (range != null) {
                 c.setRequestProperty("Range", range);
