@@ -292,13 +292,13 @@ public class DziTask {
             return false;
         }
 
-        //SSRF filter; HTTPHelper also checks every connection it makes, including redirects
         boolean isHTTP = HTTPHelper.isHTTPUrl(url);
         boolean isS3 = S3Helper.isS3Url(url);
 
         //S3 URLs, including http[s]://BUCKET.s3-REGION.amazonaws.com/KEY, are read by the S3 client, not HTTPHelper,
         //and with a PrivateLink interface endpoint their hostnames legitimately resolve to private addresses
         if (isHTTP && !isS3) {
+            //SSRF filter; HTTPHelper also checks every connection it makes, including redirects
             if (!HTTPHelper.isSafeUrl(url)) {
                 return false;
             }
