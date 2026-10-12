@@ -14,5 +14,6 @@ with open(input_file, 'r') as f: data = json.load(f)
 
 if 'tiler_version' in data: del data['tiler_version']
 if 'processing_timestamp' in data: del data['processing_timestamp']
+if 'rdr_timestamp' in data: del data['rdr_timestamp']
 
 with open(output_file, 'w') as f: json.dump(data, f, sort_keys=True, indent=2)
