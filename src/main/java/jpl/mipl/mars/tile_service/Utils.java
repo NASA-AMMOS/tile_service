@@ -131,6 +131,34 @@ public class Utils {
         return path.toLowerCase().startsWith("file://") ? path.substring(7) : path;
     }
 
+    //replace CR and LF so that request-derived values can't forge extra log lines
+    public static String sanitizeForLog(String s) {
+        return s == null ? null : s.replace('\n', '_').replace('\r', '_');
+    }
+
+    private static final String URL_SAFE_CHARS =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&()*+,;=%";
+
+    //percent encode any character that isn't an RFC 3986 unreserved or reserved character (or %) except '
+    //the result is safe to embed in an HTML attribute or a quoted JavaScript string
+    //already-encoded URLs are unchanged
+    public static String encodeUnsafeUrlChars(String url) {
+        var sb = new StringBuilder(url.length());
+        for (int i = 0; i < url.length(); i++) {
+            char c = url.charAt(i);
+            if (URL_SAFE_CHARS.indexOf(c) >= 0) {
+                sb.append(c);
+            } else {
+                int cp = url.codePointAt(i);
+                i += Character.charCount(cp) - 1;
+                for (byte b : new String(Character.toChars(cp)).getBytes(StandardCharsets.UTF_8)) {
+                    sb.append(String.format("%%%02X", b & 0xff));
+                }
+            }
+        }
+        return sb.toString();
+    }
+
     //replace the extension of the final path segment of url, or append one if it has none
     //any query and fragment are retained unchanged
     public static String setExt(String url, String ext) {

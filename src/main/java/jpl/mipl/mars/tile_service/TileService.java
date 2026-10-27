@@ -12,7 +12,9 @@ import java.io.OutputStream;
 import java.io.ByteArrayInputStream;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.InvalidPathException;
 import java.nio.file.NoSuchFileException;
 
 import java.util.Map;
@@ -649,9 +651,9 @@ public class TileService extends HttpServlet {
     private String logPrefix(HttpServletRequest request) {
         String requestPath = request.getPathInfo(); //starts with slash, but may be null
         String requestQuery = request.getQueryString(); //may be null
-        return DziTask.getVersion() + " [" +
+        return DziTask.getVersion() + " [" + Utils.sanitizeForLog(
             (requestPath != null ? requestPath : "") +
-            (requestQuery != null ? ((requestPath != null ? "?" : "") + requestQuery) : "") + "] ";
+            (requestQuery != null ? ((requestPath != null ? "?" : "") + requestQuery) : "")) + "] ";
     }
 
     private void serveTileImage(HttpServletRequest request, HttpServletResponse response,
@@ -1371,6 +1373,9 @@ public class TileService extends HttpServlet {
         String query = req.request.getQueryString();
         String params = query.replaceAll("(?i)&viewer=true", "").replaceAll("(?i)viewer=true&", "");
         String path = (new URL(req.request.getRequestURL().toString())).getPath();
+        //both are substituted into an HTML attribute and quoted JavaScript strings, avoid XSS
+        params = Utils.encodeUnsafeUrlChars(params);
+        path = Utils.encodeUnsafeUrlChars(path);
         req.response.setContentType("text/html");
         try (OutputStream out = req.response.getOutputStream()) {
             out.write(template.replace("{{PATH}}", path).replace("{{PARAMS}}", params).getBytes("UTF-8"));
@@ -1455,7 +1460,17 @@ public class TileService extends HttpServlet {
         if (relPath == null) {
             throw new IllegalArgumentException("missing " + param + " parameter");
         }
-        var fullPath = Paths.get(DziParams.fsInputDir, relPath);
+        //resolve relative to fs_input_dir and reject anything that escapes it, e.g. ../../../pwned or /etc/passwd
+        var root = Paths.get(DziParams.fsInputDir).toAbsolutePath().normalize();
+        Path fullPath;
+        try {
+            fullPath = root.resolve(relPath).normalize();
+        } catch (InvalidPathException ex) { //e.g. NUL character
+            throw new IllegalArgumentException("invalid " + param + " parameter");
+        }
+        if (relPath.startsWith("/") || !fullPath.startsWith(root)) {
+            throw new IllegalArgumentException("invalid " + param + " parameter");
+        }
         if (!Files.exists(fullPath)) {
             throw new FileNotFoundException(fullPath.toString());
         }

@@ -264,7 +264,7 @@ public class TileLambda implements RequestHandler<SQSEvent, String>  {
                     String cacheDir = cacheLoc + hashCode;
                     String cacheUrl = "s3://" + cacheBucket + "/" + cacheDir;
                     
-                    pfx = DziTask.getVersion() + " [" + rdrUrl + "] ";
+                    pfx = DziTask.getVersion() + " [" + Utils.sanitizeForLog(rdrUrl) + "] ";
                     
                     if (DziTask.filterUrl(rdrUrl)) {
                         try {

@@ -129,6 +129,11 @@ test_fail "finder/rdr?image=00051/ids/rdr/ncam/NLF_0051_0671466170_380XYM_N00319
 test_json "finder/label?image=00052/ids/rdr/ncam/NLF_0052_0671564560_659RAS_N0032046NCAM03052_0A0195J02.IMG" f026735cff80df64565ae4f6be1f40b0771702d7
 test_fail "finder/label?image=00052/ids/rdr/ncam/NLF_0052_0671564560_659RAS_N0032046NCAM03052_0A0195J02.NOT" 404
 
+#finder paths that escape fs_input_dir are rejected with 400 whether or not the file exists
+test_fail "finder/label?image=..%2F..%2F..%2F..%2F..%2F..%2Fetc%2Fpasswd" 400                    #../../../../../../etc/passwd
+test_fail "finder/edr?image=00052%2F..%2F..%2Fx.IMG" 400                                        #00052/../../x.IMG
+test_fail "finder/rdrs?edr=%2Fetc%2Fpasswd" 400                                                 #/etc/passwd
+
 #file://PATH is the same as PATH, so this hits the same cache entry as the first test_image above
 test_image file://NLG_1618_0810580175_755FDR_N0790198NCAM00518_0A02I3J01.IMG 0790b191c33408a4ae268d678b6077c6a1c079c7
 

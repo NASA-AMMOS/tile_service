@@ -345,7 +345,7 @@ public class DziParams {
             url = Utils.stripFileScheme(url); //file://PATH is the same as PATH
         }
 
-        pfx = DziTask.getVersion() + " [" + url + "] ";
+        pfx = DziTask.getVersion() + " [" + Utils.sanitizeForLog(url) + "] ";
 
         //don't do this here
         //the lambda always does this first
@@ -561,7 +561,7 @@ public class DziParams {
         String urlHash = getHashCode(url);
         hashCode = isNominal ? urlHash : (urlHash + "/cfg/" + DigestUtils.sha1Hex(toJson()));
 
-        pfx = DziTask.getVersion() + " [" + url + " -> " + hashCode + "] ";
+        pfx = DziTask.getVersion() + " [" + Utils.sanitizeForLog(url) + " -> " + hashCode + "] ";
     }
 
     private static void handleLegacyStretch(Map<String, Object> args) {
