@@ -5,6 +5,7 @@
 // fail the prefix test; that failure is the finding.
 import { randomBytes } from 'node:crypto';
 import { expect, test } from '../support/test';
+import { LIBRARY } from '../support/env';
 import { about, feature, issue, needsReview } from '../support/features';
 import { logOffset, logSince } from '../support/server';
 
@@ -41,7 +42,8 @@ test.describe('Log forging', feature('security-log-forging'), () => {
     `Same request as above. Passes when no line of the log starts with the marker at all. Messages that quote the decoded file name (for example "error getting product type for <name>") still write it raw, so a forged line remains even with the prefix fixed.`,
     '@security',
   ), async ({ tiler }) => {
-    needsReview('DziParams.java:240,289', 'warning messages quote the decoded image name with its CR/LF', { expectFail: true });
+    // the warning comes from the mission library's product lookup; a stub build never logs it
+    needsReview('DziParams.java:240,289', 'warning messages quote the decoded image name with its CR/LF', { expectFail: LIBRARY === 'mars' });
     const m = marker();
     const lines = await logLinesOf(tiler, `?image=x%0D%0A${m}%20INFO%20fake.IMG`, m);
     expect(forged(lines, m)).toEqual([]);
