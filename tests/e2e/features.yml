@@ -1,0 +1,276 @@
+# tile_service feature registry: the source of truth for what the service does
+# and where each capability is tested. Each feature's id is its report tag
+# (@<id>). features/registry.spec.ts enforces that every active feature has a
+# spec using it, every spec belongs to a feature, planned features name a
+# milestone, and excluded ones give a reason.
+# `code` and `params` are informational: where the capability lives and the
+# request parameters, CLI options or init-params that drive it.
+# See docs/TESTING.md and .github/project-requirements/criteria.md.
+features:
+  - id: dzi-tiling
+    name: Deep Zoom tiling
+    status: active
+    description: >
+      Turns a VICAR or PDS image into a Deep Zoom (DZI) pyramid: image.dzi, one directory of tiles
+      per level from 1x1 up to full size, a thumbnail and metadata.json, written to the tile cache.
+      Checked through TileCLI and the servlet on synthetic images of every data type and on public
+      Mars 2020 products.
+    code: [src/main/java/jpl/mipl/mars/tile_service/DziTask.java, src/main/java/jpl/mipl/mars/tile_service/RenderedImageReader.java, src/main/java/gov/nist/isg/pyramidio/**]
+    params: [image, -i, -fc, -cl]
+    specs: [features/dzi-tiling.spec.ts, features/mission-products.spec.ts]
+
+  - id: plain-images
+    name: PNG and JPEG inputs
+    status: active
+    description: >
+      Plain PNG and JPEG images (user uploads, CRISP warps) are tiled like VICAR products, keeping
+      their size and pixels; unknown file extensions are refused.
+    code: [src/main/java/jpl/mipl/mars/tile_service/DziTask.java]
+    params: [image]
+    specs: [features/plain-images.spec.ts]
+
+  - id: stretch
+    name: Contrast stretch
+    status: active
+    description: >
+      Scaling of 12-bit, 16-bit and floating-point data to 8-bit tiles: histogram percent (the default),
+      extrema, relative and none, with explicit low and high limits. The limits used are recorded in
+      metadata.json, which the ASTRIA viewer reads for its histogram and stretch controls.
+    code: [src/main/java/jpl/mipl/mars/tile_service/DziTask.java, src/main/java/jpl/mipl/mars/tile_service/DziParams.java]
+    params: [stretchType, stretchLow, stretchHigh, extremaStretch, -st, -sl, -sh]
+    specs: [features/stretch.spec.ts]
+
+  - id: gamma
+    name: Gamma handling
+    status: active
+    description: >
+      Linear and sRGB gamma: whether the tiler converts the data and which gamma it declares in the
+      tile headers, per gammaMode, recorded in metadata.json.
+    code: [src/main/java/jpl/mipl/mars/tile_service/DziTask.java, src/main/java/jpl/mipl/mars/tile_service/PNGChunks.java]
+    params: [gammaMode, -gm]
+    specs: [features/gamma.spec.ts]
+
+  - id: rdr-overlay
+    name: RDR overlays
+    status: active
+    description: >
+      Stereo RDRs such as XYZ point clouds are rendered as colored RGBA overlays with an alpha mask
+      for missing data, using the overlay preferences of the mission image library (contour intervals and
+      so on).
+    code: [src/main/java/jpl/mipl/mars/tile_service/DziTask.java, src/main/java/jpl/mipl/mars/tile_service/DziParams.java]
+    params: [overlayPreference, overlayAlpha, maskBlack, rdr, -op, -oa]
+    specs: [features/rdr-overlay.spec.ts]
+
+  - id: tile-options
+    name: Tile format and geometry
+    status: active
+    description: >
+      Tile format (PNG or JPEG), tile size, tile overlap and thumbnail height, per request or per CLI
+      run, as declared in the DZI descriptor and produced on disk.
+    code: [src/main/java/jpl/mipl/mars/tile_service/DziParams.java, src/main/java/jpl/mipl/mars/tile_service/DziTask.java]
+    params: [format, tileSize, tileOverlap, thumbHeight, -tf, -ts, -to, -th]
+    specs: [features/tile-options.spec.ts]
+
+  - id: thumbnail-metadata
+    name: Thumbnails and metadata
+    status: active
+    description: >
+      `thumb=true` returns the PNG thumbnail and `metadata=true` the metadata.json of a tiling: image
+      size, product and RDR type, bands and bit depth, histogram and stretch. These are the
+      thumbnails and histograms the ASTRIA viewer shows.
+    code: [src/main/java/jpl/mipl/mars/tile_service/TileService.java, src/main/java/jpl/mipl/mars/tile_service/DziTask.java]
+    params: [thumb, metadata]
+    specs: [features/thumbnail-metadata.spec.ts]
+
+  - id: async-processing
+    name: Background tiling and progress
+    status: active
+    description: >
+      Tiling runs in the background: the DZI is served at once, progress=true reports percent done,
+      error=true the failure, maxWaitSec bounds the wait (202 Accepted after it), force=true
+      recomputes, and auxiliary requests never start a tiling.
+    code: [src/main/java/jpl/mipl/mars/tile_service/TileService.java]
+    params: [progress, error, maxWaitSec, force]
+    specs: [features/async-processing.spec.ts]
+
+  - id: tile-serving
+    name: Tile serving and DZI URLs
+    status: active
+    description: >
+      Tiles are served from the cache at the URL the DZI descriptor names; the proxy parameter picks
+      the http or https form of that URL. Malformed cache hashes and missing tiles are refused.
+    code: [src/main/java/jpl/mipl/mars/tile_service/TileService.java]
+    params: [proxy, tile_url, dzi_*_override]
+    specs: [features/tile-serving.spec.ts]
+
+  - id: viewer-page
+    name: Built-in viewer
+    status: active
+    description: >
+      viewer=true returns an OpenSeadragon page for the image, which loads the DZI, thumbnail and
+      metadata from the service. Checked in headless Chromium.
+    code: [src/main/java/jpl/mipl/mars/tile_service/TileService.java, webapp/resources/viewer-template.html]
+    params: [viewer]
+    specs: [features/viewer-page.spec.ts]
+
+  - id: static-resources
+    name: Version and configuration resources
+    status: active
+    description: >
+      /version, /image_descriptions.xml (the product descriptions the ASTRIA viewer shows and the
+      ingest health check polls), /image_config.xml and /openseadragon.min.js.
+    code: [src/main/java/jpl/mipl/mars/tile_service/TileService.java]
+    specs: [features/static-resources.spec.ts]
+
+  - id: post-json
+    name: JSON POST requests
+    status: active
+    description: >
+      Tiling requests as a JSON body (`rdr_url`, `force`, `max_wait_sec`, ...) instead of query
+      parameters.
+    code: [src/main/java/jpl/mipl/mars/tile_service/TileService.java, src/main/java/jpl/mipl/mars/tile_service/DziParams.java]
+    specs: [features/post-json.spec.ts]
+
+  - id: input-sources
+    name: Input sources
+    status: active
+    description: >
+      Where images come from: paths relative to fs_input_dir, the same paths as file:// URLs (one
+      cache entry for both), public http(s) URLs, and S3 URLs (refused while S3 is disabled).
+    code: [src/main/java/jpl/mipl/mars/tile_service/DziParams.java, src/main/java/jpl/mipl/mars/tile_service/HTTPHelper.java, src/main/java/jpl/mipl/mars/tile_service/S3Helper.java]
+    params: [image, enable_http, enable_s3, fs_input_dir]
+    specs: [features/input-sources.spec.ts]
+
+  - id: url-filter
+    name: Product filters
+    status: active
+    description: >
+      Mission filters applied with filter=true: subdirectories and extensions that are not tiled
+      (browse, ids-pipeline, ...).
+    code: [src/main/java/jpl/mipl/mars/tile_service/DziTask.java]
+    params: [filter, ignore_subdirs, ignore_exts]
+    specs: [features/url-filter.spec.ts]
+
+  - id: finder-api
+    name: Product finder
+    status: active
+    description: >
+      The /finder endpoints the ingest pipeline uses: sol range, EDRs of a sol, an EDR's metadata
+      parsed from its file name, the RDRs derived from an EDR, and an RDR's metadata, over a Mars 2020
+      directory tree.
+    code: [src/main/java/jpl/mipl/mars/tile_service/Finder.java, src/main/java/jpl/mipl/mars/tile_service/TileService.java]
+    params: [finder/solrange, finder/edrs, finder/edr, finder/rdrs, finder/rdr]
+    specs: [features/finder-api.spec.ts]
+
+  - id: finder-label
+    name: VICAR label as JSON
+    status: active
+    description: >
+      /finder/label parses a product's VICAR label (system items, property groups and history tasks)
+      and returns it as JSON.
+    code: [src/main/java/jpl/mipl/mars/tile_service/Finder.java]
+    params: [finder/label]
+    specs: [features/finder-label.spec.ts]
+
+  - id: cli
+    name: TileCLI command line
+    status: active
+    description: >
+      The command-line tiler: version and help, printing the cache directory (which must match the
+      servlet's), and refusing operations that need S3 on local input.
+    code: [src/main/java/jpl/mipl/mars/tile_service/TileCLI.java]
+    params: [-v, -h, -pc, -dlc]
+    specs: [features/cli.spec.ts]
+
+  - id: security-ssrf
+    name: "Security: SSRF and URL whitelist"
+    status: active
+    description: >
+      Image URLs that point at loopback, private, link-local, metadata or otherwise non-public
+      addresses (in every IPv4 and IPv6 spelling) are refused with 400, as are schemes outside the
+      rdr_url_whitelist_patterns and S3 URLs that only look like S3.
+    code: [src/main/java/jpl/mipl/mars/tile_service/HTTPHelper.java, src/main/java/jpl/mipl/mars/tile_service/DziTask.java, src/main/java/jpl/mipl/mars/tile_service/S3Helper.java]
+    params: [image, rdr_url_whitelist_patterns]
+    specs: [features/security-ssrf.spec.ts]
+    tickets: [NASA-AMMOS/tile_service#4]
+
+  - id: security-fs-paths
+    name: "Security: local file paths"
+    status: active
+    description: >
+      Tiling requests may only read files under fs_input_dir: absolute paths, file:/// URLs and `..`
+      segments are refused with 400, whether or not the file exists.
+    code: [src/main/java/jpl/mipl/mars/tile_service/DziTask.java, src/main/java/jpl/mipl/mars/tile_service/Utils.java]
+    params: [image, fs_input_dir]
+    specs: [features/security-fs-paths.spec.ts]
+    tickets: [NASA-AMMOS/tile_service#4]
+
+  - id: security-finder-paths
+    name: "Security: finder path traversal"
+    status: active
+    description: >
+      The /finder endpoints may only read files under fs_input_dir: `..` segments, absolute paths and
+      invalid paths in image or edr are refused with 400 before any file is opened, so they cannot
+      disclose the labels or existence of files elsewhere.
+    code: [src/main/java/jpl/mipl/mars/tile_service/TileService.java, src/main/java/jpl/mipl/mars/tile_service/Finder.java]
+    params: [finder/edr, finder/rdr, finder/rdrs, finder/label]
+    specs: [features/security-finder-paths.spec.ts]
+    tickets: [fix/path-traversal-log-xss]
+
+  - id: security-log-forging
+    name: "Security: log forging"
+    status: active
+    description: >
+      Carriage returns and line feeds in request parameters must not start new lines in the service
+      log, so a request cannot forge log entries.
+    code: [src/main/java/jpl/mipl/mars/tile_service/Utils.java, src/main/java/jpl/mipl/mars/tile_service/TileService.java, src/main/java/jpl/mipl/mars/tile_service/DziParams.java]
+    specs: [features/security-log-forging.spec.ts]
+    tickets: [fix/path-traversal-log-xss]
+
+  - id: security-viewer-xss
+    name: "Security: reflected content in the viewer"
+    status: active
+    description: >
+      The viewer page copies the request's query into script and HTML attributes; characters that
+      could end a string or a tag must reach the page percent-encoded, so a crafted link cannot run
+      script in the service's origin.
+    code: [src/main/java/jpl/mipl/mars/tile_service/TileService.java, webapp/resources/viewer-template.html]
+    params: [viewer]
+    specs: [features/security-viewer-xss.spec.ts]
+    tickets: [fix/path-traversal-log-xss]
+
+  - id: cache-s3
+    name: S3 tile cache
+    status: planned
+    milestone: needs an S3 emulator (MinIO or LocalStack) in CI
+    description: >
+      cache_type=s3: tiles written to and served from an S3 bucket, presigned redirects, X-AWS client
+      credentials, cache deletion (TileCLI -dlc).
+    code: [src/main/java/jpl/mipl/mars/tile_service/S3Helper.java, src/main/java/jpl/mipl/mars/tile_service/S3Archiver.java]
+
+  - id: lambda
+    name: AWS Lambda tiler
+    status: planned
+    milestone: needs S3 and SQS emulation
+    description: >
+      TileLambda: S3 object-created events (wrapped in SQS) pre-tile new products into the S3 cache;
+      oversize inputs are forwarded to the REST service; object-removed events delete the cache entry.
+    code: [src/main/java/jpl/mipl/mars/tile_service/TileLambda.java]
+
+  - id: resource-limits
+    name: Concurrency and size limits
+    status: planned
+    milestone: second servlet configuration in the harness
+    description: >
+      tiler_max_concurrent_requests (503 when exceeded), max_concurrent_tasks, memory and disk
+      budgets, max_rdr_bytes and max_image_bytes. Each needs its own web.xml, which the harness does
+      not start yet.
+    code: [src/main/java/jpl/mipl/mars/tile_service/TileService.java]
+
+  - id: crisp-mask
+    name: CRISP warped-image mask
+    status: planned
+    milestone: a public CRISP sample or a synthetic warped-<id> image
+    description: >
+      CRISP `warped-*` images get their black border masked with alpha 0.
+    code: [src/main/java/jpl/mipl/mars/tile_service/DziParams.java]

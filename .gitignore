@@ -48,3 +48,12 @@ logs
 *.log*
 **/.tmp
 
+
+# Feature tests (tests/e2e): dependencies, downloaded data, builds under test,
+# per-run servers and caches, and generated reports and site
+tests/e2e/node_modules/
+tests/e2e/.cache/
+tests/e2e/test-results/
+tests/e2e/report/
+tests/e2e/results/
+tests/e2e/public/

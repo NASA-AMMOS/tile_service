@@ -1,0 +1,104 @@
+{
+  "description": "Public test inputs for the tile_service feature tests, pinned by SHA-256. Fetch with npm run data:fast or data:full. Only hosts on the allowlist in scripts/fetch-test-data.mjs are allowed.",
+  "assets": [
+    {
+      "id": "tomcat-9",
+      "file": "apache-tomcat-9.0.123.zip",
+      "tier": "fast",
+      "license": "Apache-2.0",
+      "source": "Apache Software Foundation release archive",
+      "description": "Apache Tomcat 9.0.123, the servlet container the suite deploys image_tiler.war into",
+      "url": "https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.123/bin/apache-tomcat-9.0.123.zip",
+      "sha256": "cf33b2ba1414434c9008e42de31975c888d9cf3cc1228109b197793fab00f0f4",
+      "bytes": 13777358
+    },
+    {
+      "id": "m20-navcam-nlg-fdr",
+      "file": "NLG_1618_0810580175_755FDR_N0790198NCAM00518_0A02I3J01.IMG",
+      "tier": "fast",
+      "license": "Public domain (NASA PDS archive data, no copyright)",
+      "source": "PDS Imaging Node, Mars 2020 public release (S3 bucket pdsimg-m2020-public via CloudFront)",
+      "description": "Navcam left FDR, sol 1618, 1-band 12-bit (mars2020_navcam_ops_calibrated)",
+      "url": "https://d1ejlg980osaur.cloudfront.net/m20/r14/mars2020_navcam_ops_calibrated/data/sol/01618/ids/fdr/ncam/NLG_1618_0810580175_755FDR_N0790198NCAM00518_0A02I3J01.IMG",
+      "sha256": "8103f13d9fb212f41f35c0f7b4deafe1c25a134e845483a2b28e0c30a26e8b0a",
+      "bytes": 2503680
+    },
+    {
+      "id": "m20-navcam-xyz",
+      "file": "NLF_1616_0810395357_230XYZ_N0790198NCAM14615_0A0195J01.IMG",
+      "tier": "fast",
+      "license": "Public domain (NASA PDS archive data, no copyright)",
+      "source": "PDS Imaging Node, Mars 2020 public release (S3 bucket pdsimg-m2020-public via CloudFront)",
+      "description": "Navcam stereo XYZ RDR, sol 1616, 3-band float point cloud: an overlay product (mars2020_navcam_ops_stereo)",
+      "url": "https://d1ejlg980osaur.cloudfront.net/m20/r14/mars2020_navcam_ops_stereo/data/sol/01616/ids/rdr/ncam/NLF_1616_0810395357_230XYZ_N0790198NCAM14615_0A0195J01.IMG",
+      "sha256": "88aab54aae8ecbfe8d7a4a161fedfe2258ca1cbea291e2c0bd8c76cdc5abfa00",
+      "bytes": 29552640
+    },
+    {
+      "id": "m20-zcam-575881",
+      "file": "ZLF_1618_0810575881_473FDR_N0790198ZCAM09697_0340LMJ01.IMG",
+      "tier": "fast",
+      "license": "Public domain (NASA PDS archive data, no copyright)",
+      "source": "PDS Imaging Node, Mars 2020 public release (S3 bucket pdsimg-m2020-public via CloudFront)",
+      "description": "Mastcam-Z left FDR, sol 1618, 3-band 12-bit color (mars2020_mastcamz_ops_calibrated)",
+      "url": "https://d1ejlg980osaur.cloudfront.net/m20/r14/mars2020_mastcamz_ops_calibrated/data/sol/01618/ids/fdr/zcam/ZLF_1618_0810575881_473FDR_N0790198ZCAM09697_0340LMJ01.IMG",
+      "sha256": "4999eebfc725bdacbe2a4dfb8cc86f24b187dc9794a8c394479b5ac6ccd57975",
+      "bytes": 11918336
+    },
+    {
+      "id": "m20-zcam-574341",
+      "file": "ZLF_1618_0810574341_473FDR_N0790198ZCAM09697_0340LMJ01.IMG",
+      "tier": "full",
+      "license": "Public domain (NASA PDS archive data, no copyright)",
+      "source": "PDS Imaging Node, Mars 2020 public release (S3 bucket pdsimg-m2020-public via CloudFront)",
+      "description": "Mastcam-Z left FDR, sol 1618 (mars2020_mastcamz_ops_calibrated)",
+      "url": "https://d1ejlg980osaur.cloudfront.net/m20/r14/mars2020_mastcamz_ops_calibrated/data/sol/01618/ids/fdr/zcam/ZLF_1618_0810574341_473FDR_N0790198ZCAM09697_0340LMJ01.IMG",
+      "sha256": "d1b72fd9434136f69732d1fdee24664d60875a9bdea31c6a010598b6621e7a5a",
+      "bytes": 11918336
+    },
+    {
+      "id": "m20-zcam-574647",
+      "file": "ZLF_1618_0810574647_473FDR_N0790198ZCAM09697_0340LMJ01.IMG",
+      "tier": "full",
+      "license": "Public domain (NASA PDS archive data, no copyright)",
+      "source": "PDS Imaging Node, Mars 2020 public release (S3 bucket pdsimg-m2020-public via CloudFront)",
+      "description": "Mastcam-Z left FDR, sol 1618 (mars2020_mastcamz_ops_calibrated)",
+      "url": "https://d1ejlg980osaur.cloudfront.net/m20/r14/mars2020_mastcamz_ops_calibrated/data/sol/01618/ids/fdr/zcam/ZLF_1618_0810574647_473FDR_N0790198ZCAM09697_0340LMJ01.IMG",
+      "sha256": "68027c054dc122cc254c20a41b5ff88f251046427723d7d5634d192740d0a000",
+      "bytes": 11915040
+    },
+    {
+      "id": "m20-zcam-575350",
+      "file": "ZLF_1618_0810575350_473FDR_N0790198ZCAM09697_0340LMJ01.IMG",
+      "tier": "full",
+      "license": "Public domain (NASA PDS archive data, no copyright)",
+      "source": "PDS Imaging Node, Mars 2020 public release (S3 bucket pdsimg-m2020-public via CloudFront)",
+      "description": "Mastcam-Z left FDR, sol 1618 (mars2020_mastcamz_ops_calibrated)",
+      "url": "https://d1ejlg980osaur.cloudfront.net/m20/r14/mars2020_mastcamz_ops_calibrated/data/sol/01618/ids/fdr/zcam/ZLF_1618_0810575350_473FDR_N0790198ZCAM09697_0340LMJ01.IMG",
+      "sha256": "f73a7b35a7c872671b14904402a098933c8c251e3ef03198976d86b71c09ca56",
+      "bytes": 11915040
+    },
+    {
+      "id": "m20-navcam-mosaic",
+      "file": "N_LRGB_1622XRZS_0790198_CYL_L_AUTOGENJ01.IMG",
+      "tier": "full",
+      "license": "Public domain (NASA PDS archive data, no copyright)",
+      "source": "PDS Imaging Node, Mars 2020 public release (S3 bucket pdsimg-m2020-public via CloudFront)",
+      "description": "Navcam cylindrical color mosaic RDR, sol 1622 (mars2020_navcam_ops_mosaic)",
+      "url": "https://d1ejlg980osaur.cloudfront.net/m20/r15/mars2020_navcam_ops_mosaic/data/sol/01622/ids/rdr/mosaic/N_LRGB_1622XRZS_0790198_CYL_L_AUTOGENJ01.IMG",
+      "sha256": "89b7a19f863805d67fc09fbedc4d1f75f0106f77bdbde5e8d2f9ef73c4137a91",
+      "bytes": 36396764
+    },
+    {
+      "id": "m20-zcam-mosaic",
+      "file": "Z_LRGB_1618XRZS_0790198_ORR_L_45M01CMJ08.IMG",
+      "tier": "full",
+      "license": "Public domain (NASA PDS archive data, no copyright)",
+      "source": "PDS Imaging Node, Mars 2020 public release (S3 bucket pdsimg-m2020-public via CloudFront)",
+      "description": "Mastcam-Z orthorectified color mosaic RDR, sol 1618, 486 MB (mars2020_mastcamz_ops_mosaic)",
+      "url": "https://d1ejlg980osaur.cloudfront.net/m20/r14/mars2020_mastcamz_ops_mosaic/data/sol/01618/ids/rdr/mosaic/Z_LRGB_1618XRZS_0790198_ORR_L_45M01CMJ08.IMG",
+      "sha256": "f52595e0dc753baf2281ec3c0fe3159cba94632425e74944557583198bee02f0",
+      "bytes": 486108000
+    }
+  ]
+}

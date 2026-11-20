@@ -1,0 +1,100 @@
+{
+  "cli/m20-navcam-nlg-fdr": {
+    "width": 1280,
+    "height": 960,
+    "tileSize": 254,
+    "format": "png",
+    "files": 45,
+    "tiles": 41,
+    "sha256": "77ef416739ee940f379e644ab850b55005e9d8791e48029c54ec3c1a5c25518c",
+    "observed": {
+      "date": "2026-11-20",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "cli/m20-navcam-xyz": {
+    "width": 2560,
+    "height": 960,
+    "tileSize": 254,
+    "format": "png",
+    "files": 74,
+    "tiles": 70,
+    "sha256": "9948c137b815eda3461d77f44bf4d50991130886eebb9d993f2aa435d236d1ff",
+    "observed": {
+      "date": "2026-11-20",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "cli/m20-zcam-575881": {
+    "width": 1648,
+    "height": 1200,
+    "tileSize": 254,
+    "format": "png",
+    "files": 64,
+    "tiles": 60,
+    "sha256": "39fb6f0132afe9fe3b2ae1eef22152090aa7b2aac580cf5a94a107ceeb2622e9",
+    "observed": {
+      "date": "2026-11-20",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "servlet/m20-navcam-nlg-fdr": {
+    "width": 1280,
+    "height": 960,
+    "tileSize": 254,
+    "format": "png",
+    "files": 45,
+    "tiles": 41,
+    "sha256": "77ef416739ee940f379e644ab850b55005e9d8791e48029c54ec3c1a5c25518c",
+    "observed": {
+      "date": "2026-11-20",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "servlet/m20-navcam-xyz": {
+    "width": 2560,
+    "height": 960,
+    "tileSize": 254,
+    "format": "png",
+    "files": 74,
+    "tiles": 70,
+    "sha256": "9948c137b815eda3461d77f44bf4d50991130886eebb9d993f2aa435d236d1ff",
+    "observed": {
+      "date": "2026-11-20",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "servlet/m20-zcam-575881": {
+    "width": 1648,
+    "height": 1200,
+    "tileSize": 254,
+    "format": "png",
+    "files": 64,
+    "tiles": 60,
+    "sha256": "39fb6f0132afe9fe3b2ae1eef22152090aa7b2aac580cf5a94a107ceeb2622e9",
+    "observed": {
+      "date": "2026-11-20",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "servlet/m20-zcam-575881 extrema 1000-3000": {
+    "width": 1648,
+    "height": 1200,
+    "tileSize": 254,
+    "format": "png",
+    "files": 64,
+    "tiles": 60,
+    "sha256": "edca7b52673b8fac315e1d1dc42f2de54bddf671acacca074d81e040f81c4d45",
+    "observed": {
+      "date": "2026-11-20",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  }
+}

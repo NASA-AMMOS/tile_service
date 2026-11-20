@@ -1,5 +1,7 @@
 # Testing
 
+> The automated tests are now the feature tests in `tests/e2e`, which run in CI and port every case of `auto-test-cli.sh` and `auto-test-servlet.sh` (including their SHA1s). See [docs/TESTING.md](../docs/TESTING.md). The scripts here remain for manual use.
+
 These test scripts and procedures require a `bash` (or `bash` compatible) shell with the following utilities
 
 * `curl`

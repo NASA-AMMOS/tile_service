@@ -1,0 +1,4 @@
+# Build context is the repository root; send only the two artifacts the image needs.
+*
+!tests/e2e/.cache/build/image_tiler.war
+!tests/e2e/.cache/build/image_tiler.jar

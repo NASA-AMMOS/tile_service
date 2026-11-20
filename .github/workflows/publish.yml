@@ -1,0 +1,144 @@
+name: Publish site and test report
+
+# Full-tier feature tests on main, published with the project home page and the
+# overview pages to GitHub Pages (Settings > Pages > Source: GitHub Actions). The
+# site is deployed whether or not tests fail, so it always shows the latest
+# result. Pull requests are tested by ci.yml and do not publish.
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '0 7 * * *'
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  e2e-full:
+    name: e2e-full
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    outputs:
+      site: ${{ steps.site.outcome }}
+    defaults:
+      run:
+        working-directory: tests/e2e
+    env:
+      JAVA_VERSION_LABEL: temurin-21
+      TILE_SERVICE_LABEL: ${{ github.ref_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: tests/e2e/package-lock.json
+
+      - name: Install site dependencies
+        run: npm ci
+
+      # The stub profile builds against gov.nasa.jpl.ammos.ids:mission-image-stub, an
+      # API-compatible placeholder for the internal mission image library. It is built
+      # from source here; nothing is resolved from a private repository. See
+      # docs/TESTING.md, "Building without internal dependencies".
+      - name: Check out the stub library
+        uses: actions/checkout@v7
+        with:
+          repository: NASA-AMMOS/Astria
+          ref: ${{ vars.ASTRIA_REF || 'main' }}
+          path: .astria
+          sparse-checkout: stub
+
+      - name: Install the stub library
+        working-directory: .
+        run: mvn -B -q -f .astria/stub/pom.xml -DskipTests install
+
+      - name: Build TileCLI jar and servlet war
+        run: bash scripts/build-product.sh
+
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Restore test data
+        id: data-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: tests/e2e/.cache/data
+          key: testdata-full-${{ hashFiles('tests/e2e/data/manifest.json') }}
+
+      - name: Fetch and verify public test data
+        run: node scripts/fetch-test-data.mjs --tier full
+
+      - name: Feature tests (full tier)
+        id: tests
+        run: npx playwright test --project full
+
+      - name: Feature summary
+        if: ${{ !cancelled() }}
+        run: cat report/overview.md >> "$GITHUB_STEP_SUMMARY" || true
+
+      - name: Save test data
+        if: success() && steps.data-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: tests/e2e/.cache/data
+          key: testdata-full-${{ hashFiles('tests/e2e/data/manifest.json') }}
+
+      - name: Upload report artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: feature-report-full
+          path: |
+            tests/e2e/report/
+            tests/e2e/results/
+            tests/e2e/.cache/run/*/catalina.out
+          retention-days: 5
+          if-no-files-found: warn
+
+      # publish the home page and overview even when the build gate or the tests failed;
+      # without a report the capabilities table says "no test results yet"
+      - name: Build site
+        id: site
+        if: ${{ !cancelled() }}
+        run: node scripts/build-site.mjs --out public
+
+      - name: Upload Pages artifact
+        if: ${{ !cancelled() && steps.site.outcome == 'success' }}
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: tests/e2e/public
+
+  deploy:
+    name: deploy
+    needs: e2e-full
+    if: ${{ !cancelled() && needs.e2e-full.outputs.site == 'success' }}
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

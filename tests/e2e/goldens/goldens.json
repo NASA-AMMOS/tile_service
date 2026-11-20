@@ -1,0 +1,310 @@
+{
+  "cli/m20-navcam-mosaic": {
+    "width": 4646,
+    "height": 1304,
+    "tileSize": 254,
+    "format": "png",
+    "files": 172,
+    "tiles": 168,
+    "sha256": "f437885267fe9d59cd5f554ab4e4ea560ebb0947cfa9d2d1113f2835683182e9",
+    "observed": {
+      "date": "2026-11-03",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "cli/m20-navcam-nlg-fdr": {
+    "width": 1280,
+    "height": 960,
+    "tileSize": 254,
+    "format": "png",
+    "files": 45,
+    "tiles": 41,
+    "sha256": "3a332c15a688e9c075ec6bace815befd4c5e98baac78a5eafc3cefea89980475",
+    "observed": {
+      "date": "2026-11-03",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "cli/m20-navcam-xyz": {
+    "width": 2560,
+    "height": 960,
+    "tileSize": 254,
+    "format": "png",
+    "files": 74,
+    "tiles": 70,
+    "sha256": "bba75c6e42a25403947b5f5332b80c983c7a3b7118b43a47806cbdff1d9ce9ca",
+    "observed": {
+      "date": "2026-11-03",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "cli/m20-zcam-574341": {
+    "width": 1648,
+    "height": 1200,
+    "tileSize": 254,
+    "format": "png",
+    "files": 64,
+    "tiles": 60,
+    "sha256": "2ea794978056cb0c852624cfb2a44d37077d126270bf83c17d8a8de42b2bc843",
+    "observed": {
+      "date": "2026-11-03",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "cli/m20-zcam-574647": {
+    "width": 1648,
+    "height": 1200,
+    "tileSize": 254,
+    "format": "png",
+    "files": 64,
+    "tiles": 60,
+    "sha256": "feb91c5e9a903a5b24cb412208510d0e7e514a2ca27098113b1109867e4cdb40",
+    "observed": {
+      "date": "2026-11-03",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "cli/m20-zcam-575350": {
+    "width": 1648,
+    "height": 1200,
+    "tileSize": 254,
+    "format": "png",
+    "files": 64,
+    "tiles": 60,
+    "sha256": "f4addb68395a75b82616973f4ab7d3e51225a7f8af3372b1c3c9258151ccd21a",
+    "observed": {
+      "date": "2026-11-03",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "cli/m20-zcam-575881": {
+    "width": 1648,
+    "height": 1200,
+    "tileSize": 254,
+    "format": "png",
+    "files": 64,
+    "tiles": 60,
+    "sha256": "7df88c81f556ea94a6cbf20f74e21289bd86eac88b891397854373433875f3ef",
+    "observed": {
+      "date": "2026-11-03",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "cli/m20-zcam-mosaic": {
+    "width": 9000,
+    "height": 9000,
+    "tileSize": 254,
+    "format": "png",
+    "files": 1752,
+    "tiles": 1748,
+    "sha256": "c55c06e371d4923112b1964a8054e2b2c84ad165034aa11e7e2682a2097bf026",
+    "observed": {
+      "date": "2026-11-03",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "cli/synthetic/byte_ramp.vic": {
+    "width": 520,
+    "height": 300,
+    "tileSize": 254,
+    "format": "png",
+    "files": 21,
+    "tiles": 17,
+    "sha256": "b5fe17be06ba860385fa3c34444772ff6f670e4219e8d561cb668929543ec301",
+    "observed": {
+      "date": "2026-11-03",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "cli/synthetic/byte_rgb.vic": {
+    "width": 160,
+    "height": 128,
+    "tileSize": 254,
+    "format": "png",
+    "files": 13,
+    "tiles": 9,
+    "sha256": "36ea1d1ade1e83da51309551960d965cd1ef15edab3c51d660617abc109c44e6",
+    "observed": {
+      "date": "2026-11-03",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "cli/synthetic/half_ramp.vic": {
+    "width": 300,
+    "height": 200,
+    "tileSize": 254,
+    "format": "png",
+    "files": 15,
+    "tiles": 11,
+    "sha256": "90928c98612aaa4208d15b734d6dc4cfac4b6aa9d11ca300056e76c56d2c1839",
+    "observed": {
+      "date": "2026-11-03",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "cli/synthetic/real_ramp.vic": {
+    "width": 140,
+    "height": 100,
+    "tileSize": 254,
+    "format": "png",
+    "files": 13,
+    "tiles": 9,
+    "sha256": "612de36707bdeee58a7d95eb5cabc2de14849a4ba4115c563ceab98fa11bc743",
+    "observed": {
+      "date": "2026-11-03",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "servlet/m20-navcam-mosaic": {
+    "width": 4646,
+    "height": 1304,
+    "tileSize": 254,
+    "format": "png",
+    "files": 172,
+    "tiles": 168,
+    "sha256": "f437885267fe9d59cd5f554ab4e4ea560ebb0947cfa9d2d1113f2835683182e9",
+    "observed": {
+      "date": "2026-11-03",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "servlet/m20-navcam-nlg-fdr": {
+    "width": 1280,
+    "height": 960,
+    "tileSize": 254,
+    "format": "png",
+    "files": 45,
+    "tiles": 41,
+    "sha256": "3a332c15a688e9c075ec6bace815befd4c5e98baac78a5eafc3cefea89980475",
+    "observed": {
+      "date": "2026-11-03",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "servlet/m20-navcam-xyz": {
+    "width": 2560,
+    "height": 960,
+    "tileSize": 254,
+    "format": "png",
+    "files": 74,
+    "tiles": 70,
+    "sha256": "bba75c6e42a25403947b5f5332b80c983c7a3b7118b43a47806cbdff1d9ce9ca",
+    "observed": {
+      "date": "2026-11-03",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "servlet/m20-navcam-xyz contourInterval": {
+    "width": 2560,
+    "height": 960,
+    "tileSize": 254,
+    "format": "png",
+    "files": 74,
+    "tiles": 70,
+    "sha256": "4c94f6176c8e8299baf99eb8bddb05eb501e53c8d2635ebcb79944e7c9742f11",
+    "observed": {
+      "date": "2026-11-03",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "servlet/m20-zcam-574341": {
+    "width": 1648,
+    "height": 1200,
+    "tileSize": 254,
+    "format": "png",
+    "files": 64,
+    "tiles": 60,
+    "sha256": "2ea794978056cb0c852624cfb2a44d37077d126270bf83c17d8a8de42b2bc843",
+    "observed": {
+      "date": "2026-11-03",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "servlet/m20-zcam-574647": {
+    "width": 1648,
+    "height": 1200,
+    "tileSize": 254,
+    "format": "png",
+    "files": 64,
+    "tiles": 60,
+    "sha256": "feb91c5e9a903a5b24cb412208510d0e7e514a2ca27098113b1109867e4cdb40",
+    "observed": {
+      "date": "2026-11-03",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "servlet/m20-zcam-575350": {
+    "width": 1648,
+    "height": 1200,
+    "tileSize": 254,
+    "format": "png",
+    "files": 64,
+    "tiles": 60,
+    "sha256": "f4addb68395a75b82616973f4ab7d3e51225a7f8af3372b1c3c9258151ccd21a",
+    "observed": {
+      "date": "2026-11-03",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "servlet/m20-zcam-575881": {
+    "width": 1648,
+    "height": 1200,
+    "tileSize": 254,
+    "format": "png",
+    "files": 64,
+    "tiles": 60,
+    "sha256": "7df88c81f556ea94a6cbf20f74e21289bd86eac88b891397854373433875f3ef",
+    "observed": {
+      "date": "2026-11-03",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "servlet/m20-zcam-575881 extrema 1000-3000": {
+    "width": 1648,
+    "height": 1200,
+    "tileSize": 254,
+    "format": "png",
+    "files": 64,
+    "tiles": 60,
+    "sha256": "1ab169725657c37f96148d5cf787ff39c32a49d17be4cdb6e3d9475ada558a7f",
+    "observed": {
+      "date": "2026-11-03",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  },
+  "servlet/m20-zcam-mosaic": {
+    "width": 9000,
+    "height": 9000,
+    "tileSize": 254,
+    "format": "png",
+    "files": 1752,
+    "tiles": 1748,
+    "sha256": "c55c06e371d4923112b1964a8054e2b2c84ad165034aa11e7e2682a2097bf026",
+    "observed": {
+      "date": "2026-11-03",
+      "os": "darwin-arm64",
+      "java": "unknown"
+    }
+  }
+}

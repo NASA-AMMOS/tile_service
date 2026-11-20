@@ -1,0 +1,139 @@
+name: CI
+
+# PR gate. The jobs below are the required status checks for main and develop
+# (see docs/TESTING.md, "Branch protection").
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  e2e-fast:
+    name: e2e-fast
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      pull-requests: write   # the feature-report comment
+    defaults:
+      run:
+        working-directory: tests/e2e
+    env:
+      JAVA_VERSION_LABEL: temurin-21
+      TILE_SERVICE_LABEL: ${{ github.head_ref || github.ref_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: tests/e2e/package-lock.json
+
+      # The stub profile builds against gov.nasa.jpl.ammos.ids:mission-image-stub, an
+      # API-compatible placeholder for the internal mission image library. It is built
+      # from source here; nothing is resolved from a private repository. See
+      # docs/TESTING.md, "Building without internal dependencies".
+      - name: Check out the stub library
+        uses: actions/checkout@v7
+        with:
+          repository: NASA-AMMOS/Astria
+          ref: ${{ vars.ASTRIA_REF || 'main' }}
+          path: .astria
+          sparse-checkout: stub
+
+      - name: Install the stub library
+        working-directory: .
+        run: mvn -B -q -f .astria/stub/pom.xml -DskipTests install
+
+      - name: Build TileCLI jar and servlet war
+        run: bash scripts/build-product.sh
+
+      - name: Install test dependencies
+        run: npm ci && npx playwright install --with-deps chromium
+
+      - name: Restore test data
+        id: data-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: tests/e2e/.cache/data
+          key: testdata-fast-${{ hashFiles('tests/e2e/data/manifest.json') }}
+
+      - name: Fetch and verify public test data
+        run: node scripts/fetch-test-data.mjs --tier fast
+
+      - name: Feature tests (fast tier)
+        run: npx playwright test --project fast
+        env:
+          # source links in the report point at the PR's commit, not the merge commit
+          SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Feature summary
+        if: always()
+        run: cat report/overview.md >> "$GITHUB_STEP_SUMMARY" || true
+
+      # save only after a green run, so a bad download never occupies the key
+      - name: Save test data
+        if: success() && steps.data-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: tests/e2e/.cache/data
+          key: testdata-fast-${{ hashFiles('tests/e2e/data/manifest.json') }}
+
+      - name: Upload report
+        id: upload
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: feature-report-fast
+          path: |
+            tests/e2e/report/
+            tests/e2e/results/
+            tests/e2e/.cache/run/*/catalina.out
+          retention-days: 5
+          if-no-files-found: warn
+
+      # fork PRs get a read-only token, so only same-repository PRs are commented on
+      - name: Comment the feature summary on the pull request
+        if: ${{ !cancelled() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPORT_URL: ${{ steps.upload.outputs.artifact-url }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: node scripts/pr-comment.mjs
+
+  data-guard:
+    name: data-guard
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: No internal paths or unpinned data
+        run: bash tests/e2e/scripts/check-data-sensitivity.sh
