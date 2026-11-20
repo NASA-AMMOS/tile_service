@@ -47,6 +47,9 @@
         <version.aws-lambda-java-core>1.4.0</version.aws-lambda-java-core>
         <version.aws-lambda-java-events>3.16.1</version.aws-lambda-java-events>
         <version.aws-java-v2-bom>2.42.19</version.aws-java-v2-bom>
+        <!-- mission image library: JPL-internal mars by default; the stub profile
+             swaps in mission-image-stub (same packages, no mission knowledge) -->
+        <mars.artifactId>mars</mars.artifactId>
         <version.mars>3.8.2-SNAPSHOT</version.mars>
         <!-- vicario is open source (https://github.com/NASA-AMMOS/vicario) and published to Maven Central -->
         <version.vicario>2.7.2</version.vicario>
@@ -305,7 +308,7 @@
     <dependencies>
         <dependency>
             <groupId>gov.nasa.jpl.ammos.ids</groupId>
-            <artifactId>mars</artifactId>
+            <artifactId>${mars.artifactId}</artifactId>
             <version>${version.mars}</version>
             <exclusions>
               <!-- don't include old AWS 1.x java API -->
@@ -496,6 +499,17 @@
             <properties>
                 <packaging.type>war</packaging.type>
                 <webXml.location>webapp/WEB-INF/localhost-fscache-web.xml</webXml.location>
+            </properties>
+        </profile>
+        <!-- Build without JPL Artifactory: -P stub (combine with jar or war-*).
+             mission-image-stub is an API-compatible placeholder with no mission knowledge:
+             every product is treated as a plain image and RDR overlays are unavailable.
+             Install it first from https://github.com/NASA-AMMOS/Astria (stub/). -->
+        <profile>
+            <id>stub</id>
+            <properties>
+                <mars.artifactId>mission-image-stub</mars.artifactId>
+                <version.mars>3.8.2-stub.1</version.mars>
             </properties>
         </profile>
         <profile>

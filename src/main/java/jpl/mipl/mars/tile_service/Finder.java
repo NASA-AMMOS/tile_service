@@ -268,7 +268,7 @@ public class Finder {
         md.add("stage", TypeIdToName.getStageName(imconf.getProductContext(ns).getStageType(productType)));
         md.add("version", finder.extractVersion(filename, pt));
         md.add("sclk", sclk != null ? sclk : "NULL");
-        md.add("image_type", imageType);
+        md.add("image_type", imageType != null ? imageType : productType); //same fallback as DziParams.getRDRType()
         md.add("description", imconf.getProductDescription(ns, productType));
         md.add("supplemental_description", finder.getUIContext().getSupplementalDescription(filename));
 
@@ -297,7 +297,6 @@ public class Finder {
                 }
                 case "CADRE": {
                     //CADRE Image Filename Spec
-                    //https://docs.google.com/document/d/1fzfoIWHC0C_05bdYG2pKrMfQ6NTvr74XDSGHiLQx3zs
                     sol = ((CadreOdsImageFileFinder)finder).extractCycleYdoy(filename);
                     int n = Integer.parseInt(sol);
                     md.add("wake_cycle_or_ydoy", n);
